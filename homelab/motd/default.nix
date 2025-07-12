@@ -11,11 +11,32 @@ let
     ) config.homelab.services
   );
 
-  networkInterface =
+/*   networkInterface =
     if lib.attrsets.hasAttrByPath [ config.networking.hostName ] config.homelab.networks.external then
       config.homelab.networks.external.${config.networking.hostName}.interface
     else
-      "";
+      ""; */
+
+         /*  ${lib.strings.concatMapStrings (x: "${x}\n") (
+      lib.lists.forEach config.homelab.motd.networkInterfaces (
+        x:
+        lib.strings.concatMapStrings (x: "${x}\n") ([
+          (
+            if x == "" then
+              ''
+                NETDEV=$(ip -o route get 8.8.8.8 | cut -f 5 -d " ")
+              ''
+            else
+              ''
+                NETDEV=${x}
+              ''
+          )
+          ''
+            printf "$BOLD  * %-20s$ENDCOLOR %s\n" "IPv4 $NETDEV" "$(ip -4 addr show $NETDEV | grep -oP '(?<=inet\s)\d+(\.\d+){3}')"
+          ''
+        ])
+      )
+    )} */
   motd = pkgs.writeShellScriptBin "motd" ''
     #! /usr/bin/env bash
     source /etc/os-release
@@ -49,26 +70,9 @@ let
 
     printf "$BOLD Welcome to $(hostname)!$ENDCOLOR\n"
     printf "\n"
-    ${lib.strings.concatMapStrings (x: "${x}\n") (
-      lib.lists.forEach config.homelab.motd.networkInterfaces (
-        x:
-        lib.strings.concatMapStrings (x: "${x}\n") ([
-          (
-            if x == "" then
-              ''
-                NETDEV=$(ip -o route get 8.8.8.8 | cut -f 5 -d " ")
-              ''
-            else
-              ''
-                NETDEV=${x}
-              ''
-          )
-          ''
-            printf "$BOLD  * %-20s$ENDCOLOR %s\n" "IPv4 $NETDEV" "$(ip -4 addr show $NETDEV | grep -oP '(?<=inet\s)\d+(\.\d+){3}')"
-          ''
-        ])
-      )
-    )}
+
+
+
     printf "$BOLD  * %-20s$ENDCOLOR %s\n" "Release" "$PRETTY_NAME"
     printf "$BOLD  * %-20s$ENDCOLOR %s\n" "Kernel" "$(uname -rs)"
     printf "\n"
@@ -101,11 +105,11 @@ in
     enable = lib.mkEnableOption {
       description = "motd Greeting";
     };
-    networkInterfaces = lib.mkOption {
+/*     networkInterfaces = lib.mkOption {
       description = "Network interfaces to monitor";
       type = lib.types.listOf lib.types.str;
       default = [ networkInterface ];
-    };
+    }; */
   };
   config = lib.mkIf config.homelab.motd.enable {
     environment.systemPackages = [ motd ];

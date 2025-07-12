@@ -25,16 +25,14 @@
   };
 
   imports = [
-    ./filesystems
     ./nix
-    "${inputs.secrets}/networks.nix"
     ./secrets
   ];
 
-  time.timeZone = "Europe/Berlin";
+  time.timeZone = "Europe/Bratislava";
 
   users.users = {
-    notthebee = {
+    magic_sk = {
       hashedPasswordFile = config.age.secrets.hashedUserPassword.path;
     };
     root = {
@@ -71,15 +69,6 @@
     viAlias = true;
     vimAlias = true;
     defaultEditor = true;
-  };
-
-  email = {
-    enable = true;
-    fromAddress = "moe@notthebe.ee";
-    toAddress = "server_announcements@mailbox.org";
-    smtpServer = "email-smtp.eu-west-1.amazonaws.com";
-    smtpUsername = "AKIAYYXVLL34J7LSXFZF";
-    smtpPasswordPath = config.age.secrets.smtpPassword.path;
   };
 
   security = {

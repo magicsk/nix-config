@@ -7,9 +7,6 @@
 }:
 {
   home.packages = with pkgs; [ grc ];
-  age.secrets = lib.mkIf (pkgs.system == "aarch64-darwin") {
-    bwSession.file = "${inputs.secrets}/bwSession.age";
-  };
 
   programs = {
     fzf = {

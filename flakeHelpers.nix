@@ -5,41 +5,23 @@ let
     home-manager.extraSpecialArgs = {
       inherit inputs;
     };
-    home-manager.users.notthebee.imports = [
+    home-manager.users.magic_sk.imports = [
       inputs.agenix.homeManagerModules.default
-      inputs.nix-index-database.hmModules.nix-index
-      ./users/notthebee/dots.nix
-      ./users/notthebee/age.nix
+      inputs.nix-index-database.homeModules.nix-index
+      ./users/magic_sk/dots.nix
+      ./users/magic_sk/age.nix
     ] ++ extraImports;
     home-manager.backupFileExtension = "bak";
     home-manager.useUserPackages = userPackages;
   };
 in
 {
-
-  mkDarwin = machineHostname: nixpkgsVersion: extraHmModules: extraModules: {
-    darwinConfigurations.${machineHostname} = inputs.nix-darwin.lib.darwinSystem {
-      system = "aarch64-darwin";
-      specialArgs = {
-        inherit inputs;
-      };
-      modules = [
-        inputs.agenix-darwin.darwinModules.default
-        ./machines/darwin
-        ./machines/darwin/${machineHostname}
-        inputs.home-manager-unstable.darwinModules.home-manager
-        (nixpkgsVersion.lib.attrsets.recursiveUpdate (homeManagerCfg true extraHmModules) {
-          home-manager.users.notthebee.home.homeDirectory = nixpkgsVersion.lib.mkForce "/Users/notthebee";
-        })
-      ];
-    };
-  };
   mkNixos = machineHostname: nixpkgsVersion: extraModules: rec {
     deploy.nodes.${machineHostname} = {
       hostname = machineHostname;
       profiles.system = {
         user = "root";
-        sshUser = "notthebee";
+        sshUser = "magic_sk";
         path = inputs.deploy-rs.lib.x86_64-linux.activate.nixos nixosConfigurations.${machineHostname};
       };
     };
@@ -52,12 +34,9 @@ in
         ./homelab
         ./machines/nixos/_common
         ./machines/nixos/${machineHostname}
-        ./modules/email
-        ./modules/tg-notify
         ./modules/auto-aspm
-        ./modules/mover
         inputs.agenix.nixosModules.default
-        ./users/notthebee
+        ./users/magic_sk
         (homeManagerCfg false [ ])
       ] ++ extraModules;
     };
@@ -66,3 +45,4 @@ in
     a: b: inputs.nixpkgs.lib.attrsets.recursiveUpdate a b
   ) { };
 }
+

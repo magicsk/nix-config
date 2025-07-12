@@ -17,18 +17,6 @@ in
       type = lib.types.str;
       default = "pass.${homelab.baseDomain}";
     };
-    cloudflared.credentialsFile = lib.mkOption {
-      type = lib.types.str;
-      example = lib.literalExpression ''
-        pkgs.writeText "cloudflare-credentials.json" '''
-        {"AccountTag":"secret"."TunnelSecret":"secret","TunnelID":"secret"}
-        '''
-      '';
-    };
-    cloudflared.tunnelId = lib.mkOption {
-      type = lib.types.str;
-      example = "00000000-0000-0000-0000-000000000000";
-    };
     homepage.name = lib.mkOption {
       type = lib.types.str;
       default = "Vaultwarden";
@@ -48,14 +36,6 @@ in
   };
   config = lib.mkIf cfg.enable {
     services = {
-      fail2ban-cloudflare = lib.mkIf config.services.fail2ban-cloudflare.enable {
-        jails = {
-          vaultwarden = {
-            serviceName = "vaultwarden";
-            failRegex = "^.*Username or password is incorrect. Try again. IP: <HOST>. Username: <F-USER>.*</F-USER>.$";
-          };
-        };
-      };
       ${service} = {
         enable = true;
         config = {
@@ -66,16 +46,6 @@ in
           EXTENDED_LOGGING = true;
           LOG_LEVEL = "warn";
           IP_HEADER = "CF-Connecting-IP";
-        };
-      };
-      cloudflared = {
-        enable = true;
-        tunnels.${cfg.cloudflared.tunnelId} = {
-          credentialsFile = cfg.cloudflared.credentialsFile;
-          default = "http_status:404";
-          ingress."${cfg.url}".service = "http://${config.services.${service}.config.ROCKET_ADDRESS}:${
-            toString config.services.${service}.config.ROCKET_PORT
-          }";
         };
       };
     };

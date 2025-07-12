@@ -16,7 +16,7 @@
     ];
     security.acme = {
       acceptTerms = true;
-      defaults.email = "moe@notthebe.ee";
+      defaults.email = "minemagicsk@gmail.com";
       certs.${config.homelab.baseDomain} = {
         reloadServices = [ "caddy.service" ];
         domain = "${config.homelab.baseDomain}";
@@ -54,7 +54,6 @@
     virtualisation.podman = {
       dockerCompat = true;
       autoPrune.enable = true;
-      extraPackages = [ pkgs.zfs ];
       defaultNetwork.settings = {
         dns_enabled = true;
       };
@@ -69,32 +68,22 @@
   };
 
   imports = [
-    ./backup
+    # ./backup
     ./arr/prowlarr
-    ./arr/bazarr
+    # ./arr/bazarr
     ./arr/jellyseerr
     ./arr/sonarr
     ./arr/radarr
     #./arr/lidarr
-    ./audiobookshelf
+    # ./audiobookshelf
     ./deluge
-    #./deemix
-    ./homepage
-    ./immich
+    # ./homepage
+    # ./immich
     ./jellyfin
-    ./keycloak
-    ./microbin
-    ./miniflux
-    #./navidrome
     ./nextcloud
-    ./smarthome/homeassistant
-    ./smarthome/raspberrymatic
-    ./paperless-ngx
-    ./radicale
-    ./sabnzbd
-    #./slskd
-    ./uptime-kuma
+    ./homeassistant
+    # ./paperless-ngx
+    # ./uptime-kuma
     ./vaultwarden
-    ./wireguard-netns
   ];
 }

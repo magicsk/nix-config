@@ -15,7 +15,6 @@
   inputs = {
     flake-utils.url = "github:numtide/flake-utils";
     nixpkgs.url = "github:nixos/nixpkgs/nixos-25.05";
-    nixpkgs-darwin.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
     nixvim = {
       url = "github:nix-community/nixvim";
@@ -29,10 +28,6 @@
       url = "github:nix-community/home-manager/master";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
-    ryzen-undervolt = {
-      url = "github:svenlange2/Ryzen-5800x3d-linux-undervolting/0f05965f9939259c27a428065fda5a6c0cbb9225";
-      flake = false;
-    };
     auto-aspm = {
       url = "github:notthebee/AutoASPM";
       flake = false;
@@ -41,20 +36,8 @@
       url = "github:ryantm/agenix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    agenix-darwin = {
-      url = "github:ryantm/agenix";
-      inputs.nixpkgs.follows = "nixpkgs-darwin";
-    };
     recyclarr-configs = {
       url = "github:recyclarr/config-templates";
-      flake = false;
-    };
-    nix-darwin = {
-      url = "github:LnL7/nix-darwin/master";
-      inputs.nixpkgs.follows = "nixpkgs-darwin";
-    };
-    adios-bot = {
-      url = "github:notthebee/adiosbot";
       flake = false;
     };
     nix-index-database = {
@@ -62,26 +45,20 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     secrets = {
-      url = "git+ssh://git@github.com/notthebee/nix-private.git";
+      url = "git+ssh://git@github.com/magicsk/nix-private.git?ref=main";
       flake = false;
-    };
-    jovian = {
-      url = "github:Jovian-Experiments/Jovian-NixOS";
-      inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
     alga = {
       url = "github:Tenzer/alga";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
     deploy-rs.url = "github:serokell/deploy-rs";
-
   };
 
-  outputs =
-    { flake-utils, nixpkgs, ... }@inputs:
+  outputs = { flake-utils, nixpkgs, ... }@inputs:
     let
       helpers = import ./flakeHelpers.nix inputs;
-      inherit (helpers) mkMerge mkNixos mkDarwin;
+      inherit (helpers) mkMerge mkNixos;
     in
     mkMerge [
       (flake-utils.lib.eachDefaultSystem (
@@ -98,41 +75,9 @@
           };
         }
       ))
-      (mkNixos "spencer" inputs.nixpkgs [
-        ./modules/notthebe.ee
+     (mkNixos "magic-pylon" inputs.nixpkgs [
         ./homelab
         inputs.home-manager.nixosModules.home-manager
       ])
-      (mkNixos "maya" inputs.nixpkgs-unstable [
-        ./modules/ryzen-undervolt
-        ./modules/lgtv
-        inputs.jovian.nixosModules.default
-        inputs.home-manager-unstable.nixosModules.home-manager
-      ])
-      (mkNixos "alison" inputs.nixpkgs [
-        ./modules/zfs-root
-        ./homelab
-        inputs.home-manager.nixosModules.home-manager
-      ])
-      (mkNixos "emily" inputs.nixpkgs [
-        ./modules/zfs-root
-        ./modules/tailscale
-        ./modules/adios-bot
-        ./homelab
-        inputs.home-manager.nixosModules.home-manager
-      ])
-      (mkNixos "aria" inputs.nixpkgs [
-        ./modules/zfs-root
-        ./modules/tailscale
-        ./homelab
-        inputs.home-manager.nixosModules.home-manager
-      ])
-      (mkDarwin "meredith" inputs.nixpkgs-darwin
-        [
-          dots/tmux
-          dots/kitty
-        ]
-        [ ]
-      )
     ];
 }

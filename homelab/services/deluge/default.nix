@@ -7,11 +7,10 @@
 let
   hl = config.homelab;
   cfg = hl.services.deluge;
-  ns = hl.services.wireguard-netns.namespace;
 in
 {
   options.homelab.services.deluge = {
-    enable = lib.mkEnableOption "Deluge torrent client (bound to a Wireguard VPN network)";
+    enable = lib.mkEnableOption "Deluge torrent client";
     configDir = lib.mkOption {
       type = lib.types.str;
       default = "/var/lib/deluge";
@@ -54,13 +53,10 @@ in
       '';
     };
 
-    systemd = lib.mkIf hl.services.wireguard-netns.enable {
-      services.deluged.bindsTo = [ "netns@${ns}.service" ];
+    systemd = {
       services.deluged.requires = [
         "network-online.target"
-        "${ns}.service"
       ];
-      services.deluged.serviceConfig.NetworkNamespacePath = [ "/var/run/netns/${ns}" ];
       sockets."deluged-proxy" = {
         enable = true;
         description = "Socket for Proxy to Deluge WebUI";

@@ -17,8 +17,8 @@ From your host, copy the public SSH key to the server
 
 ```bash
 export NIXOS_HOST=192.168.2.xxx
-ssh-add ~/.ssh/notthebee
-ssh-copy-id -i ~/.ssh/notthebee root@$NIXOS_HOST
+ssh-add ~/.ssh/magic_sk
+ssh-copy-id -i ~/.ssh/magic_sk root@$NIXOS_HOST
 ```
 
 SSH into the host with agent forwarding enabled (for the secrets repo access)
@@ -40,7 +40,7 @@ Partition and mount the drives using [disko](https://github.com/nix-community/di
 DISK='/dev/disk/by-id/ata-Samsung_SSD_870_EVO_250GB_S6PENL0T902873K'
 DISK2='/dev/disk/by-id/ata-Samsung_SSD_870_EVO_250GB_S6PE58S586SAER'
 
-curl https://raw.githubusercontent.com/notthebee/nix-config/main/disko/zfs-root/default.nix \
+curl https://raw.githubusercontent.com/magic_sk/nix-config/main/disko/zfs-root/default.nix \
     -o /tmp/disko.nix
 sed -i "s|to-be-filled-during-installation|$DISK|" /tmp/disko.nix
 nix --experimental-features "nix-command flakes" run github:nix-community/disko \
@@ -57,18 +57,18 @@ Clone this repository
 
 ```bash
 mkdir -p /mnt/etc/nixos
-git clone https://github.com/notthebee/nix-config.git /mnt/etc/nixos
+git clone https://github.com/magic_sk/nix-config.git /mnt/etc/nixos
 ```
 
 Put the private key into place (required for secret management)
 
 ```bash
-mkdir -p /mnt/home/notthebee/.ssh
+mkdir -p /mnt/home/magic_sk/.ssh
 exit
-scp ~/.ssh/notthebee root@$NIXOS_HOST:/mnt/home/notthebee/.ssh
+scp ~/.ssh/magic_sk root@$NIXOS_HOST:/mnt/home/magic_sk/.ssh
 ssh root@$NIXOS_HOST
-chmod 700 /mnt/home/notthebee/.ssh
-chmod 600 /mnt/home/notthebee/.ssh/*
+chmod 700 /mnt/home/magic_sk/.ssh
+chmod 600 /mnt/home/magic_sk/.ssh/*
 ```
 
 Install the system

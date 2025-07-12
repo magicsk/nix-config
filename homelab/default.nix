@@ -5,20 +5,6 @@ in
 {
   options.homelab = {
     enable = lib.mkEnableOption "The homelab services and configuration variables";
-    mounts.slow = lib.mkOption {
-      default = "/mnt/mergerfs_slow";
-      type = lib.types.path;
-      description = ''
-        Path to the 'slow' tier mount
-      '';
-    };
-    mounts.fast = lib.mkOption {
-      default = "/mnt/cache";
-      type = lib.types.path;
-      description = ''
-        Path to the 'fast' tier mount
-      '';
-    };
     mounts.config = lib.mkOption {
       default = "/persist/opt/services";
       type = lib.types.path;
@@ -26,11 +12,32 @@ in
         Path to the service configuration files
       '';
     };
-    mounts.merged = lib.mkOption {
-      default = "/mnt/user";
+    mounts.Alumentum = lib.mkOption {
+      default = "/mnt/Alumentum";
       type = lib.types.path;
       description = ''
-        Path to the merged tier mount
+        Path to the Alumentum (HDD 1TB)
+      '';
+    };
+    mounts.Nitor = lib.mkOption {
+      default = "/mnt/Nitor";
+      type = lib.types.path;
+      description = ''
+        Path to the Nitor (2x HDD RAID0 6TB)
+      '';
+    };
+    mounts.Wilson = lib.mkOption {
+      default = "/mnt/Wilson";
+      type = lib.types.path;
+      description = ''
+        Path to the Wilson (SSD 2TB, subvolume on system disk)
+      '';
+    };
+    mounts.Tallow = lib.mkOption {
+      default = "/mnt/Tallow";
+      type = lib.types.path;
+      description = ''
+        Path to the Tallow (SSD 256GB)
       '';
     };
     user = lib.mkOption {
@@ -50,14 +57,14 @@ in
       #apply = old: builtins.toString config.users.groups."${old}".gid;
     };
     timeZone = lib.mkOption {
-      default = "Europe/Berlin";
+      default = "Europe/Bratislava";
       type = lib.types.str;
       description = ''
         Time zone to be used for the homelab services
       '';
     };
     baseDomain = lib.mkOption {
-      default = "";
+      default = "magicsk.eu";
       type = lib.types.str;
       description = ''
         Base domain name to be used to access the homelab services via Caddy reverse proxy
@@ -70,9 +77,8 @@ in
   imports = [
     ./services
     ./samba
-    ./networks
+    # ./networks
     ./motd
-    ./fail2ban-cloudflare
   ];
   config = lib.mkIf cfg.enable {
     users = {
