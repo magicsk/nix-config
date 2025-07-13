@@ -60,10 +60,6 @@
     let
       helpers = import ./flakeHelpers.nix inputs;
       inherit (helpers) mkMerge mkNixos;
-      nixosSystem = mkNixos "magic-pylon" inputs.nixpkgs [
-        ./homelab
-        inputs.home-manager.nixosModules.home-manager
-      ];
     in
     mkMerge [
       (flake-utils.lib.eachDefaultSystem (
@@ -80,10 +76,9 @@
           };
         }
       ))
-      nixosSystem
-      # Add system build outputs for nixos-rebuild
-      {
-        packages.x86_64-linux.magic-pylon = nixosSystem.nixosConfigurations.magic-pylon.config.system.build.toplevel;
-      }
+     (mkNixos "magic-pylon" inputs.nixpkgs [
+        ./homelab
+        inputs.home-manager.nixosModules.home-manager
+      ])
     ];
 }
