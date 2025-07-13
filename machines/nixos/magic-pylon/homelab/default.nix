@@ -15,43 +15,37 @@ in
       Wilson = "/mnt/Wilson";
       Tallow = "/mnt/Tallow";
     };
-  /*   samba = {
+    samba = {
       enable = true;
       passwordFile = config.age.secrets.sambaPassword.path;
       shares = {
-        Backups = {
-          path = "${hl.mounts.merged}/Backups";
+        Alumentum = {
+          path = hl.mounts.Alumentum;
         };
-        Documents = {
-          path = "${hl.mounts.fast}/Documents";
+        Nitor = {
+          path = hl.mounts.Nitor;
         };
-        Media = {
-          path = "${hl.mounts.merged}/Media";
+        Wilson = {
+          path = hl.mounts.Wilson;
         };
-        Music = {
-          path = "${hl.mounts.fast}/Media/Music";
+        Tallow = {
+          path = hl.mounts.Tallow;
         };
-        Misc = {
-          path = "${hl.mounts.merged}/Misc";
+        config = {
+          path = hl.mounts.config;
         };
         TimeMachine = {
-          path = "${hl.mounts.fast}/TimeMachine";
+          path = "${hl.mounts.Nitor}/TimeMachine";
           "fruit:time machine" = "yes";
         };
-        YoutubeArchive = {
-          path = "${hl.mounts.merged}/YoutubeArchive";
-        };
-        YoutubeCurrent = {
-          path = "${hl.mounts.fast}/YoutubeCurrent";
-        };
       };
-    }; */
+    };
     services = {
       enable = true;
-      /* immich = {
+      immich = {
         enable = true;
-        mediaDir = "${hl.mounts.fast}/Media/Photos";
-      }; */
+        mediaDir = "${hl.mounts.Nitor}/Photos";
+      };
       /* homepage = {
         enable = true;
         misc = [

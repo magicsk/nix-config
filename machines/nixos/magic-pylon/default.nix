@@ -53,18 +53,22 @@ in
   };
 
   networking = {
-    useDHCP = true;
+    useDHCP = false;
     networkmanager.enable = false;
     hostName = "magic-pylon";
+    
+    # Create a bridge that acts as a pure switch
+    bridges.br0 = {
+      interfaces = [ "enp1s0" "enp2s0" "enp3s0" "enp4s0" ];  # All ports bridged together
+    };
+    
+    # The bridge itself gets IP from your main router
+    interfaces.br0.useDHCP = true;
+    
     firewall = {
-      enable = true;
+      enable = false;
       allowPing = true;
-      trustedInterfaces = [
-        "enp1s0"
-        "enp2s0"
-        "enp3s0"
-        "enp4s0"
-      ];
+      trustedInterfaces = [ "enp2s0" "enp3s0" "enp4s0" ];
     };
   };
 

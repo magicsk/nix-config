@@ -8,8 +8,8 @@ in
       default = { };
       example = lib.literalExpression ''
         hostname = {
-          address = "192.168.2.2";
-          gateway = "192.168.2.1";
+          address = "10.0.0.5";
+          gateway = "10.0.0.1";
           interface = "enp1s0";
         };
       '';
@@ -17,11 +17,11 @@ in
         lib.types.submodule {
           options = {
             address = lib.mkOption {
-              example = "192.168.2.2";
+              example = "10.0.0.5";
               type = lib.types.str;
             };
             gateway = lib.mkOption {
-              example = "192.168.2.1";
+              example = "10.0.0.1";
               type = lib.types.str;
             };
             interface = lib.mkOption {
