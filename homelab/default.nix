@@ -76,8 +76,8 @@ in
   };
   imports = [
     ./services
-    /* ./samba
-    ./networks */
+    ./samba
+    /* ./networks */
     ./motd
   ];
   config = lib.mkIf cfg.enable {

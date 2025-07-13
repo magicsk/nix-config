@@ -7,13 +7,6 @@
 let
   hl = config.homelab;
   cfg = hl.samba;
-  ext = hl.networks.external;
-  int = hl.networks.local;
-  smb_networks =
-    if ext ? config.networking.hostName then
-      lib.lists.singleton "${ext.${config.networking.hostName}.gateway}/24"
-    else
-      lib.mapAttrsToList (_: val: "${val.cidr.v4}/24") (lib.attrsets.filterAttrs (n: v: v.trusted) int);
 in
 {
   options.homelab.samba = {
@@ -110,7 +103,6 @@ in
             "netbios name" = lib.mkDefault config.networking.hostName;
             "security" = lib.mkDefault "user";
             "invalid users" = [ "root" ];
-            "hosts allow" = lib.mkDefault (lib.strings.concatStringsSep " " smb_networks);
             "guest account" = lib.mkDefault "nobody";
             "map to guest" = lib.mkDefault "bad user";
             "passdb backend" = lib.mkDefault "tdbsam";
