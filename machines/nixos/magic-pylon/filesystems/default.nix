@@ -7,6 +7,13 @@ let
   hl = config.homelab;
 in
 {
+  systemd.tmpfiles.rules = [
+    "d /mnt/Wilson 0755 root root -"
+    "d /mnt/Alumentum 0755 root root -"
+    "d /mnt/Nitor 0755 root root -"
+    "d /mnt/Tallow 0755 root root -"
+  ];
+
   fileSystems."/" =
     { device = "/dev/disk/by-uuid/caa3ae9c-92aa-4a2a-b4b4-06ac762cd838";
       fsType = "btrfs";
