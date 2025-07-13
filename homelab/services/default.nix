@@ -78,7 +78,7 @@
     # ./audiobookshelf
     ./deluge
     # ./homepage
-    # ./immich
+    ./immich
     ./jellyfin
     ./nextcloud
     ./homeassistant

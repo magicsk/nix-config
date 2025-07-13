@@ -22,7 +22,7 @@ in
     };
     mediaDir = lib.mkOption {
       type = lib.types.path;
-      default = "${config.homelab.mounts.fast}/Photos/Immich";
+      default = "${config.homelab.mounts.Nitor}/Photos";
     };
     url = lib.mkOption {
       type = lib.types.str;
