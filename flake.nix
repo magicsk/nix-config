@@ -55,10 +55,15 @@
     deploy-rs.url = "github:serokell/deploy-rs";
   };
 
-  outputs = { flake-utils, nixpkgs, ... }@inputs:
+  outputs =
+    { flake-utils, nixpkgs, ... }@inputs:
     let
       helpers = import ./flakeHelpers.nix inputs;
       inherit (helpers) mkMerge mkNixos;
+      nixosSystem = mkNixos "magic-pylon" inputs.nixpkgs [
+        ./homelab
+        inputs.home-manager.nixosModules.home-manager
+      ];
     in
     mkMerge [
       (flake-utils.lib.eachDefaultSystem (
@@ -75,9 +80,10 @@
           };
         }
       ))
-     (mkNixos "magic-pylon" inputs.nixpkgs [
-        ./homelab
-        inputs.home-manager.nixosModules.home-manager
-      ])
+      nixosSystem
+      # Add system build outputs for nixos-rebuild
+      {
+        packages.x86_64-linux.magic-pylon = nixosSystem.nixosConfigurations.magic-pylon.config.system.build.toplevel;
+      }
     ];
 }
