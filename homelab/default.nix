@@ -83,10 +83,10 @@ in
   config = lib.mkIf cfg.enable {
     users = {
       groups.${cfg.group} = {
-        gid = 993;
+        gid = 1000;
       };
       users.${cfg.user} = {
-        uid = 994;
+        uid = 1000;
         isSystemUser = true;
         group = cfg.group;
       };
