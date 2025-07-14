@@ -33,6 +33,7 @@ in
         "writeable" = "yes";
         "read only" = "no";
         "guest ok" = "no";
+        "allow insecure wide links" = "yes";
       };
     };
     commonSettings = lib.mkOption {
