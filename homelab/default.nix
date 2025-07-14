@@ -41,7 +41,7 @@ in
       '';
     };
     user = lib.mkOption {
-      default = "share";
+      default = "magic_sk";
       type = lib.types.str;
       description = ''
         User to run the homelab services as
@@ -49,7 +49,7 @@ in
       #apply = old: builtins.toString config.users.users."${old}".uid;
     };
     group = lib.mkOption {
-      default = "share";
+      default = "magic_sk";
       type = lib.types.str;
       description = ''
         Group to run the homelab services as

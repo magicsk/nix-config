@@ -35,7 +35,7 @@ in
           path = hl.mounts.config;
         };
         TimeMachine = {
-          path = "${hl.mounts.Nitor}/TimeMachine";
+          path = "${hl.mounts.Nitor}/TimeCapsule";
           "fruit:time machine" = "yes";
         };
       };
@@ -79,6 +79,7 @@ in
           }
         ];
       }; */
+      homeassistant.enable = true;
       jellyfin.enable = true;
       /* paperless = {
         enable = true;
