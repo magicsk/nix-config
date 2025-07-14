@@ -33,7 +33,6 @@ in
         "writeable" = "yes";
         "read only" = "no";
         "guest ok" = "no";
-        "allow insecure wide links" = "yes";
       };
     };
     commonSettings = lib.mkOption {
@@ -107,6 +106,7 @@ in
             "guest account" = lib.mkDefault "nobody";
             "map to guest" = lib.mkDefault "bad user";
             "passdb backend" = lib.mkDefault "tdbsam";
+            "allow insecure wide links" = "yes";
           }
           cfg.globalSettings
         ];
