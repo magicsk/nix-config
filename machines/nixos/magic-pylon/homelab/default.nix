@@ -20,7 +20,7 @@ in
       passwordFile = config.age.secrets.sambaPassword.path;
       shares = {
         Alumentum = {
-          path = hl.mounts.Alumentum;
+          path = "${hl.mounts.Alumentum}/media";
         };
         Nitor = {
           path = hl.mounts.Nitor;
@@ -95,7 +95,7 @@ in
       };
       vaultwarden.enable = true;
       /* audiobookshelf.enable = true; */
-      deluge.enable = true;
+      # deluge.enable = true;
     };
   };
 }

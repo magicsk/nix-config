@@ -14,9 +14,13 @@ in
     enable = lib.mkEnableOption {
       description = "Enable ${service}";
     };
+    dataDir = lib.mkOption {
+      type = lib.types.str;
+      default = "/persist/opt/services/${service}";
+    };
     configDir = lib.mkOption {
       type = lib.types.str;
-      default = "/var/lib/${service}";
+      default = "/persist/opt/services/${service}/config";
     };
     url = lib.mkOption {
       type = lib.types.str;
