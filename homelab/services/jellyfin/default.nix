@@ -65,8 +65,8 @@ in
     ];
     services.${service} = {
       enable = true;
-      configdir = cfg.configDir;
-      datadir = cfg.dataDir;
+      configDir = cfg.configDir;
+      dataDir = cfg.dataDir;
       user = homelab.user;
       group = homelab.group;
     };
