@@ -33,6 +33,8 @@ in
         };
         config = {
           path = hl.mounts.config;
+          "follow symlinks" = "yes";
+          "wide links" = "yes";
         };
         TimeMachine = {
           path = "${hl.mounts.Nitor}/TimeCapsule";
