@@ -9,6 +9,10 @@ in
     enable = lib.mkEnableOption {
       description = "Enable ${service}";
     };
+    configDir = lib.mkOption {
+      type = lib.types.str;
+      default = "/persist/opt/services/${service}";
+    };
     url = lib.mkOption {
       type = lib.types.str;
       default = "${service}.${homelab.baseDomain}";
@@ -38,7 +42,9 @@ in
     services.${service} = {
       enable = true;
       port = cfg.port;
+      configDir = cfg.configDir;
     };
+    systemd.services.${service}.serviceConfig.ReadWritePaths = [ cfg.configDir ];
     services.caddy.virtualHosts."${cfg.url}" = {
       useACMEHost = homelab.baseDomain;
       extraConfig = ''

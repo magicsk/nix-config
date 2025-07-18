@@ -11,7 +11,7 @@ in
     };
     configDir = lib.mkOption {
       type = lib.types.str;
-      default = "/var/lib/${service}";
+      default = "/persist/opt/services/${service}";
     };
     url = lib.mkOption {
       type = lib.types.str;

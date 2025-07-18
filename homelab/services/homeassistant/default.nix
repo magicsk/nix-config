@@ -38,7 +38,7 @@ in
     services.caddy.virtualHosts."${cfg.url}" = {
       useACMEHost = homelab.baseDomain;
       extraConfig = ''
-        reverse_proxy http://127.0.0.1:8123
+        reverse_proxy http://10.0.0.5:8123
       '';
     };
     virtualisation = {
@@ -50,13 +50,14 @@ in
             autoStart = true;
             extraOptions = [
               "--pull=newer"
+              "--device=/dev/ttyUSB0:/dev/ttyUSB0"
             ];
             volumes = [
               "${cfg.configDir}:/config"
             ];
             ports = [
-              "127.0.0.1:8123:8123"
-              "127.0.0.1:8124:80"
+              "8123:8123"
+              "8124:80"
             ];
             environment = {
               TZ = homelab.timeZone;

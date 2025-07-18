@@ -9,9 +9,9 @@ in
     enable = lib.mkEnableOption {
       description = "Enable ${service}";
     };
-    configDir = lib.mkOption {
+    dataDir = lib.mkOption {
       type = lib.types.str;
-      default = "/var/lib/${service}";
+      default = "/persist/opt/services/${service}";
     };
     url = lib.mkOption {
       type = lib.types.str;
@@ -35,15 +35,25 @@ in
     };
   };
   config = lib.mkIf cfg.enable {
-    services.${service} = {
-      enable = true;
+    services = {
+      ${service} = {
+        enable = true;
+      };
+      caddy.virtualHosts."${cfg.url}" = {
+        useACMEHost = homelab.baseDomain;
+        extraConfig = ''
+          reverse_proxy http://127.0.0.1:9696
+        '';
+      };
     };
-    services.caddy.virtualHosts."${cfg.url}" = {
-      useACMEHost = homelab.baseDomain;
-      extraConfig = ''
-        reverse_proxy http://127.0.0.1:9696
-      '';
+    systemd = {
+      tmpfiles.rules = [
+        "d ${cfg.dataDir} 0777 ${homelab.user} ${homelab.group} -"
+      ];
+      services.${service}.serviceConfig = {
+        ExecStart = lib.mkForce "${lib.getExe config.services.${service}.package} -nobrowser -data=${cfg.dataDir}";
+        ReadWritePaths = [ cfg.dataDir ];
+      };
     };
   };
-
 }

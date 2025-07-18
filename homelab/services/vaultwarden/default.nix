@@ -9,13 +9,13 @@ in
     enable = lib.mkEnableOption {
       description = "Enable ${service}";
     };
-    configDir = lib.mkOption {
+    dataDir = lib.mkOption {
       type = lib.types.str;
-      default = "/var/lib/bitwarden_rs";
+      default = "/persist/opt/services/${service}";
     };
     url = lib.mkOption {
       type = lib.types.str;
-      default = "pass.${homelab.baseDomain}";
+      default = "bitwarden.${homelab.baseDomain}";
     };
     homepage.name = lib.mkOption {
       type = lib.types.str;
@@ -46,8 +46,23 @@ in
           EXTENDED_LOGGING = true;
           LOG_LEVEL = "warn";
           IP_HEADER = "CF-Connecting-IP";
+          DATA_FOLDER = cfg.dataDir;
         };
       };
+      caddy.virtualHosts."${cfg.url}" = {
+        useACMEHost = homelab.baseDomain;
+        extraConfig = ''
+          reverse_proxy http://127.0.0.1:8222
+        '';
+      };
+    };
+    systemd = {
+      services.${service}.serviceConfig = {
+        ReadWritePaths = [ cfg.dataDir ];
+      };
+      tmpfiles.rules = [
+        "d ${cfg.dataDir} 0777 ${homelab.user} ${homelab.group} -"
+      ];
     };
   };
 

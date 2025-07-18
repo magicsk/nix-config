@@ -9,9 +9,9 @@ in
     enable = lib.mkEnableOption {
       description = "Enable ${service}";
     };
-    configDir = lib.mkOption {
+    dataDir = lib.mkOption {
       type = lib.types.str;
-      default = "/var/lib/${service}";
+      default = "/persist/opt/services/${service}";
     };
     url = lib.mkOption {
       type = lib.types.str;
@@ -37,6 +37,7 @@ in
   config = lib.mkIf cfg.enable {
     services.${service} = {
       enable = true;
+      dataDir = cfg.dataDir;
       user = homelab.user;
       group = homelab.group;
     };
