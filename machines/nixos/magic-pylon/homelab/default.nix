@@ -52,31 +52,11 @@ in
         enable = true;
         misc = [
           {
-            PiKVM =
-              let
-                ip = config.homelab.networks.local.lan.reservations.pikvm.Address;
-              in
-              {
-                href = "https://${ip}";
-                siteMonitor = "https://${ip}";
-                description = "Open-source KVM solution";
-                icon = "pikvm.png";
-              };
-          }
-          {
             FritzBox = {
-              href = "http://192.168.178.1";
-              siteMonitor = "http://192.168.178.1";
-              description = "Cable Modem WebUI";
+              href = "http://wifi-ap.local";
+              siteMonitor = "http://wifi-ap.local";
+              description = "WiFi AP WebUI";
               icon = "avm-fritzbox.png";
-            };
-          }
-          {
-            "Immich (Parents)" = {
-              href = "https://photos.aria.goose.party";
-              description = "Self-hosted photo and video management solution";
-              icon = "immich.svg";
-              siteMonitor = "";
             };
           }
         ];
@@ -96,6 +76,7 @@ in
         adminpassFile = config.age.secrets.nextcloudAdminPassword.path;
       };
       vaultwarden.enable = true;
+      qbittorrent.enable = true;
       /* audiobookshelf.enable = true; */
       # deluge.enable = true;
     };

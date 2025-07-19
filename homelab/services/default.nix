@@ -76,7 +76,7 @@
     ./arr/radarr
     #./arr/lidarr
     # ./audiobookshelf
-    # ./deluge
+    ./qbittorrent
     # ./homepage
     ./immich
     ./jellyfin

@@ -75,6 +75,9 @@ in
 
   swapDevices = [ { device = "/swap/swapfile"; } ];
 
+  zramSwap.enable = true;
+
+
   # services.smartd = {
   #   enable = true;
   #   defaults.autodetected = "-a -o on -S on -s (S/../.././02|L/../../6/03) -n standby,q";

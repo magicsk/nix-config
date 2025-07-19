@@ -8,8 +8,8 @@
 let
   hl = config.homelab;
   hardDrives = [
-    "/dev/disk/by-label/Data"
-    "/dev/disk/by-label/Storage"
+    "/dev/disk/by-uuid/8c78faa7-c01b-4847-a9ed-5c2c9d500868" # Alumentum
+    "/dev/disk/by-uuid/a85d790f-f428-4be9-ac0f-e40ff7b6f575" # Nitor
   ];
 in
 {
