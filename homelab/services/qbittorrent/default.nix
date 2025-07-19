@@ -1,6 +1,6 @@
 { config, lib, ... }:
 let
-  service = "qbitttorrent";
+  service = "qbittorrent";
   cfg = config.homelab.services.${service};
   homelab = config.homelab;
 in
@@ -19,7 +19,7 @@ in
     };
     homepage.name = lib.mkOption {
       type = lib.types.str;
-      default = "Qbitttorrent";
+      default = "qBittorrent";
     };
     homepage.description = lib.mkOption {
       type = lib.types.str;
@@ -27,7 +27,7 @@ in
     };
     homepage.icon = lib.mkOption {
       type = lib.types.str;
-      default = "qbitttorrent.svg";
+      default = "qbittorrent.svg";
     };
     homepage.category = lib.mkOption {
       type = lib.types.str;

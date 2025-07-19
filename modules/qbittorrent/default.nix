@@ -68,7 +68,7 @@ in
 
     nixpkgs.overlays = [
       (final: prev: {
-        qbittorrent = prev.qbittorrent.override { guiSupport = false; };
+        qbittorrent-enhanced = prev.qbittorrent-enhanced.override { guiSupport = false; };
       })
     ];
 
@@ -84,9 +84,10 @@ in
       path = [ pkgs.qbittorrent-enhanced ];
       serviceConfig = {
         ExecStart = ''
-          ${pkgs.qbittorrent}/bin/qbittorrent-enhanced-nox \
-            --profile=${dataDir} \
-            --webui-port=${toString cfg.port}
+          ${pkgs.qbittorrent-enhanced}/bin/qbittorrent-nox \
+            --profile=${cfg.dataDir} \
+            --webui-port=${toString cfg.port} \
+            --confirm-legal-notice
         '';
         # To prevent "Quit & shutdown daemon" from working; we want systemd to
         # manage it!
