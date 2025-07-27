@@ -46,27 +46,33 @@ in
       enable = true;
       immich = {
         enable = true;
-        mediaDir = "${hl.mounts.Nitor}/Photos";
       };
-      /* homepage = {
+      homepage = {
         enable = true;
         misc = [
           {
-            FritzBox = {
+            Router = {
+              href = "http://magic-port.local";
+              siteMonitor = "http://magic-port.local";
+              description = "OpenWrt WebUI";
+              icon = "sh-openwrt.svg";
+            };
+            Access point = {
               href = "http://wifi-ap.local";
               siteMonitor = "http://wifi-ap.local";
               description = "WiFi AP WebUI";
-              icon = "avm-fritzbox.png";
+              icon = "mdi-wifi";
             };
           }
         ];
-      }; */
+      };
       homeassistant.enable = true;
+      zigbee2mqtt.enable = true;
       jellyfin.enable = true;
-      /* paperless = {
+      paperless = {
         enable = true;
         passwordFile = config.age.secrets.paperlessPassword.path;
-      }; */
+      };
       sonarr.enable = true;
       radarr.enable = true;
       prowlarr.enable = true;
@@ -78,7 +84,6 @@ in
       vaultwarden.enable = true;
       qbittorrent.enable = true;
       /* audiobookshelf.enable = true; */
-      # deluge.enable = true;
     };
   };
 }

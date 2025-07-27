@@ -77,13 +77,14 @@
     #./arr/lidarr
     # ./audiobookshelf
     ./qbittorrent
-    # ./homepage
+    ./homepage
     ./immich
     ./jellyfin
     ./nextcloud
     ./homeassistant
-    # ./paperless-ngx
+    ./paperless-ngx
     # ./uptime-kuma
+    ./zigbee2mqtt
     ./vaultwarden
   ];
 }
