@@ -41,7 +41,7 @@ in
     services.glances.enable = true;
     services.${service} = {
       enable = true;
-      environmentFile = builtins.toFile "homepage.env" "HOMEPAGE_ALLOWED_HOSTS=${homelab.baseDomain}";
+      environmentFile = builtins.toFile "homepage.env" "HOMEPAGE_ALLOWED_HOSTS=lab.${homelab.baseDomain}";
       customCSS = ''
         body, html {
           font-family: SF Pro Display, Helvetica, Arial, sans-serif !important;
@@ -188,7 +188,7 @@ in
           }
         ];
     };
-    services.caddy.virtualHosts."${homelab.baseDomain}" = {
+    services.caddy.virtualHosts."lab.${homelab.baseDomain}" = {
       useACMEHost = homelab.baseDomain;
       extraConfig = ''
         reverse_proxy http://127.0.0.1:${toString config.services.${service}.listenPort}
