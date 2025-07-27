@@ -20,7 +20,7 @@ in
     };
     configDir = lib.mkOption {
       type = lib.types.str;
-      default = "${homelab.mounts.config}${service}/config";
+      default = "${homelab.mounts.config}/${service}/config";
     };
     url = lib.mkOption {
       type = lib.types.str;
