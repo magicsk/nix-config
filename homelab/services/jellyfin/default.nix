@@ -16,11 +16,11 @@ in
     };
     dataDir = lib.mkOption {
       type = lib.types.str;
-      default = "/persist/opt/services/${service}";
+      default = "${homelab.mounts.config}/${service}";
     };
     configDir = lib.mkOption {
       type = lib.types.str;
-      default = "/persist/opt/services/${service}/config";
+      default = "${homelab.mounts.config}${service}/config";
     };
     url = lib.mkOption {
       type = lib.types.str;

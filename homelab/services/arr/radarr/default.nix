@@ -11,7 +11,7 @@ in
     };
     dataDir = lib.mkOption {
       type = lib.types.str;
-      default = "/persist/opt/services/${service}";
+      default = "${homelab.mounts.config}/${service}";
     };
     url = lib.mkOption {
       type = lib.types.str;
