@@ -82,9 +82,10 @@
     ./jellyfin
     ./nextcloud
     ./homeassistant
+    ./mosquitto
+    ./zigbee2mqtt
     ./paperless-ngx
     # ./uptime-kuma
-    ./zigbee2mqtt
     ./vaultwarden
   ];
 }
