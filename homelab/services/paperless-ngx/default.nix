@@ -11,18 +11,18 @@ in
     };
     mediaDir = lib.mkOption {
       type = lib.types.str;
-      default = "${homelab.mounts.fast}/Documents/Paperless/Documents";
+      default = "${homelab.mounts.Nitor}/Documents/Paperless/Documents";
     };
     consumptionDir = lib.mkOption {
       type = lib.types.str;
-      default = "${homelab.mounts.fast}/Documents/Paperless/Import";
+      default = "${homelab.mounts.Nitor}/Documents/Paperless/Import";
     };
     passwordFile = lib.mkOption {
       type = lib.types.path;
     };
-    configDir = lib.mkOption {
+    dataDir = lib.mkOption {
       type = lib.types.str;
-      default = "/var/lib/${service}";
+      default = "${homelab.mounts.config}/${service}";
     };
     url = lib.mkOption {
       type = lib.types.str;
@@ -52,6 +52,7 @@ in
         enable = true;
         passwordFile = cfg.passwordFile;
         user = homelab.user;
+        dataDir = cfg.dataDir;
         mediaDir = cfg.mediaDir;
         consumptionDir = cfg.consumptionDir;
         consumptionDirIsPublic = true;
@@ -60,7 +61,8 @@ in
             ".DS_STORE/*"
             "desktop.ini"
           ];
-          PAPERLESS_OCR_LANGUAGE = "deu+eng";
+          PAPERLESS_OCR_LANGUAGE = "slk+eng";
+          PAPERLESS_URL = "https://${cfg.url}";
           PAPERLESS_OCR_USER_ARGS = {
             optimize = 1;
             pdfa_image_compression = "lossless";
@@ -74,5 +76,11 @@ in
         '';
       };
     };
+    systemd.tmpfiles.rules = [
+      "d ${homelab.mounts.Nitor}/Documents/Paperless 0777 ${homelab.user} ${homelab.group} - -"
+      "d ${cfg.dataDir} 0777 ${homelab.user} ${homelab.group} - -"
+      "d ${cfg.mediaDir} 0777 ${homelab.user} ${homelab.group} - -"
+      "d ${cfg.consumptionDir} 0777 ${homelab.user} ${homelab.group} - -"
+    ];
   };
 }
