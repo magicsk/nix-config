@@ -56,8 +56,6 @@ in
             "create mask" = "0644";
             "directory mask" = "0755";
             "valid users" = hl.user;
-            "fruit:aapl" = "yes";
-            "vfs objects" = "catia fruit streams_xattr";
           }
           old
         ];
@@ -106,6 +104,20 @@ in
             "guest account" = lib.mkDefault "nobody";
             "map to guest" = lib.mkDefault "bad user";
             "passdb backend" = lib.mkDefault "tdbsam";
+            "vfs objects" = "catia fruit streams_xattr";
+            "fruit:metadata" = "stream";
+            "fruit:model" = "MacPro7,1@ECOLOR=226,226,224";
+            "fruit:posix_rename" = "yes ";
+            "fruit:veto_appledouble" = "no";
+            "fruit:wipe_intentionally_left_blank_rfork" = "yes";
+            "fruit:delete_empty_adfiles" = "yes";
+            "fruit:advertise_fullsync" = "true";
+            "fruit:aapl" = "yes";
+            "fruit:copyfile" = "yes";
+            "fruit:zero_file_id" = "yes";
+            "fruit:nfs_aces" = "no";
+            "acl allow execute always" = "True";
+            "msdfs root" = "no";
             "allow insecure wide links" = "yes";
           }
           cfg.globalSettings
