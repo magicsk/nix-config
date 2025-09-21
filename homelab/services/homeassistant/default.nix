@@ -10,7 +10,7 @@ in
     };
     configDir = lib.mkOption {
       type = lib.types.str;
-      default = "/persist/opt/services/homeassistant";
+      default = "${homelab.mounts.config}/homeassistant";
     };
     url = lib.mkOption {
       type = lib.types.str;
@@ -50,10 +50,13 @@ in
             autoStart = true;
             extraOptions = [
               "--pull=newer"
-              "--device=/dev/ttyUSB0:/dev/ttyUSB0"
             ];
             volumes = [
               "${cfg.configDir}:/config"
+              "${homelab.mounts.Alumentum}:/mnt/Alumentum"
+              "${homelab.mounts.Nitor}:/mnt/Nitor"
+              "${homelab.mounts.Wilson}:/mnt/Wilson"
+              "${homelab.mounts.Tallow}:/mnt/Tallow"
             ];
             ports = [
               "127.0.0.1:8123:8123"
