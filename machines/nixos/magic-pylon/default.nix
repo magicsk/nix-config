@@ -78,7 +78,7 @@ in
     ./secrets
   ];
 
-/*   systemd.services.hd-idle = {
+  systemd.services.hd-idle = {
     description = "External HD spin down daemon";
     wantedBy = [ "multi-user.target" ];
     serviceConfig = {
@@ -90,7 +90,7 @@ in
         in
         "${pkgs.hd-idle}/bin/hd-idle -i 0 ${hardDriveParameter}";
     };
-  }; */
+  };
 
 /*   services.hddfancontrol = {
     enable = true;
