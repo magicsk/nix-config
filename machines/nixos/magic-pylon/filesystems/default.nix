@@ -77,6 +77,10 @@ in
 
   zramSwap.enable = true;
 
+  services.btrfs.autoScrub = {
+    enable = true;
+    interval = "weekly";
+  };
 
   # services.smartd = {
   #   enable = true;
