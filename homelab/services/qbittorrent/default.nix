@@ -36,7 +36,7 @@ in
   };
   config = lib.mkIf cfg.enable {
     services = {
-      ${service} = {
+      qbittorrent-enhanced = {
         enable = true;
         dataDir = cfg.dataDir;
         user = homelab.user;

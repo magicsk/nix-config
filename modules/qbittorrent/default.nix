@@ -1,11 +1,11 @@
 { config, lib, pkgs, ... }:
 with lib;
 let
-  cfg = config.services.qbittorrent;
+  cfg = config.services.qbittorrent-enhanced;
   openFilesLimit = 4096;
 in
 {
-  options.services.qbittorrent = {
+  options.services.qbittorrent-enhanced = {
     enable = mkOption {
       type = types.bool;
       default = false;
