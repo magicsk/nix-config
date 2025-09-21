@@ -51,13 +51,15 @@ in
         enable = true;
         misc = [
           {
-            Router = {
+            "Router" = {
               href = "http://magic-port.local";
               siteMonitor = "http://magic-port.local";
               description = "OpenWrt WebUI";
-              icon = "sh-openwrt.svg";
+              icon = "sh-openwrt-light.svg";
             };
-            Access point = {
+          }
+          {
+            "Access point" = {
               href = "http://wifi-ap.local";
               siteMonitor = "http://wifi-ap.local";
               description = "WiFi AP WebUI";
@@ -67,6 +69,7 @@ in
         ];
       };
       homeassistant.enable = true;
+      mosquitto.enable = true;
       zigbee2mqtt.enable = true;
       jellyfin.enable = true;
       paperless = {
