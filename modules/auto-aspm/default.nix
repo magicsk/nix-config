@@ -7,7 +7,7 @@
 }:
 let
   cfg = config.services.auto-aspm;
-  auto-aspm = pkgs.writeScriptBin "auto-aspm" (builtins.readFile "${inputs.auto-aspm}/autoaspm.py");
+  auto-aspm = pkgs.writeScriptBin "auto-aspm" (builtins.readFile "${inputs.auto-aspm}/pkgs/autoaspm.py");
 in
 {
   options.services.auto-aspm = {
