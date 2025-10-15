@@ -224,11 +224,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1760479847,
-        "narHash": "sha256-xOwdvpPSHw767aXyeo3GG8DjFbZ9YyRIVSr4TXADQ48=",
+        "lastModified": 1760500983,
+        "narHash": "sha256-zfY4F4CpeUjTGgecIJZ+M7vFpwLc0Gm9epM/iMQd4w8=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "ed1eb4cfddba1be85cb16702d7a42803d1ff55e8",
+        "rev": "c53e65ec92f38d30e3c14f8d628ab55d462947aa",
         "type": "github"
       },
       "original": {
@@ -341,11 +341,11 @@
     },
     "nixpkgs_2": {
       "locked": {
-        "lastModified": 1760139962,
-        "narHash": "sha256-4xggC56Rub3WInz5eD7EZWXuLXpNvJiUPahGtMkwtuc=",
+        "lastModified": 1760423683,
+        "narHash": "sha256-Tb+NYuJhWZieDZUxN6PgglB16yuqBYQeMJyYBGCXlt8=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "7e297ddff44a3cc93673bb38d0374df8d0ad73e4",
+        "rev": "a493e93b4a259cd9fea8073f89a7ed9b1c5a1da2",
         "type": "github"
       },
       "original": {
@@ -365,11 +365,11 @@
         "systems": "systems_6"
       },
       "locked": {
-        "lastModified": 1760472915,
-        "narHash": "sha256-8o8VoHB5IRiK+HmO387ICkkI5npIbDAoIqaIwIAy10E=",
+        "lastModified": 1760538614,
+        "narHash": "sha256-RSim5VyR6tqq3tJImSNYIXIjdA6k+0BWz6JFgQTkQiQ=",
         "owner": "nix-community",
         "repo": "nixvim",
-        "rev": "32a3fa118d187dc9c88f35a78e763a5b895b6227",
+        "rev": "d60696f62d0f9265dd9eff8e54ce2cd4b20c92e1",
         "type": "github"
       },
       "original": {
@@ -487,11 +487,11 @@
     "secrets": {
       "flake": false,
       "locked": {
-        "lastModified": 1752449636,
-        "narHash": "sha256-pNx780I1Frq22PoFqCw8PI7+u3eJyr08xLN+gZv4ifM=",
+        "lastModified": 1760559919,
+        "narHash": "sha256-L2srLch9oBkDFjXaDv42uHIlbTt7EKUvSvAlEwSs7eg=",
         "ref": "main",
-        "rev": "da684637f049ca894b2ddca4c1093fa3f67b8039",
-        "revCount": 3,
+        "rev": "abfef93f23e0d4bba8eb1a5ddbff4deb0737a0d5",
+        "revCount": 4,
         "type": "git",
         "url": "ssh://git@github.com/magicsk/nix-private.git"
       },

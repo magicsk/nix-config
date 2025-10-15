@@ -87,6 +87,11 @@ in
       vaultwarden.enable = true;
       qbittorrent.enable = true;
       redlib.enable = true;
+      code-server = {
+        enable = true;
+        passFile = config.age.secrets.codeServerPassword.path;
+        passSudoFile = config.age.secrets.codeServerSudoPassword.path;
+      };
       /* audiobookshelf.enable = true; */
     };
   };

@@ -76,6 +76,7 @@
     #./arr/lidarr
     # ./audiobookshelf
     # ./backup
+    ./code-server
     ./homeassistant
     ./homepage
     ./immich
