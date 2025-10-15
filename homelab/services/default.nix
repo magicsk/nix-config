@@ -68,7 +68,6 @@
   };
 
   imports = [
-    # ./backup
     ./arr/prowlarr
     # ./arr/bazarr
     ./arr/jellyseerr
@@ -76,16 +75,18 @@
     ./arr/radarr
     #./arr/lidarr
     # ./audiobookshelf
-    ./qbittorrent
+    # ./backup
+    ./homeassistant
     ./homepage
     ./immich
     ./jellyfin
-    ./nextcloud
-    ./homeassistant
     ./mosquitto
-    ./zigbee2mqtt
+    ./nextcloud
     ./paperless-ngx
+    ./qbittorrent
+    ./redlib
     # ./uptime-kuma
     ./vaultwarden
+    ./zigbee2mqtt
   ];
 }
