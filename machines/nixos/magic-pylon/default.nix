@@ -25,8 +25,8 @@ in
         intel-media-driver
         intel-vaapi-driver
         vaapiVdpau
-        intel-compute-runtime # OpenCL filter support (hardware tonemapping and subtitle burn-in)
-        vpl-gpu-rt # QSV on 11th gen or newer
+        intel-compute-runtime
+        vpl-gpu-rt
       ];
     };
   };
@@ -52,30 +52,11 @@ in
     initrd.availableKernelModules = [ "xhci_pci" "ahci" "nvme" "usb_storage" "usbhid" "sd_mod" ];
   };
 
-  networking = {
-    useDHCP = false;
-    networkmanager.enable = false;
-    hostName = "magic-pylon";
-    
-    # Create a bridge that acts as a pure switch
-    bridges.br0 = {
-      interfaces = [ "enp1s0" "enp2s0" "enp3s0" "enp4s0" ];  # All ports bridged together
-    };
-    
-    # The bridge itself gets IP from your main router
-    interfaces.br0.useDHCP = true;
-    
-    firewall = {
-      enable = false;
-      allowPing = true;
-      trustedInterfaces = [ "enp2s0" "enp3s0" "enp4s0" ];
-    };
-  };
-
   imports = [
     ./homelab
     ./filesystems
     ./secrets
+    ./network
   ];
 
   systemd.services.hd-idle = {
@@ -147,6 +128,7 @@ in
     xfsprogs
     parted
     btrfs-progs
+    wireguard-tools
   ];
 
 /*   tg-notify = {
