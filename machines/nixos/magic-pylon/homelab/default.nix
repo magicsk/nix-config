@@ -88,6 +88,7 @@ in
         passFile = config.age.secrets.codeServerPassword.path;
         passSudoFile = config.age.secrets.codeServerSudoPassword.path;
       };
+      esphome.enable = true;
       /* audiobookshelf.enable = true; */
     };
   };

@@ -77,6 +77,7 @@
     # ./audiobookshelf
     # ./backup
     ./code-server
+    ./esphome
     ./homeassistant
     ./homepage
     ./immich

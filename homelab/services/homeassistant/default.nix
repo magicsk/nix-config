@@ -54,16 +54,13 @@ in
             autoStart = true;
             extraOptions = [
               "--pull=newer"
+              "--network=host"
             ];
             volumes = [
               "${cfg.configDir}:/config"
               "${homelab.mounts.Alumentum}:/mnt/Alumentum"
               "${homelab.mounts.Nitor}:/mnt/Nitor"
               "${homelab.mounts.Wilson}:/mnt/Wilson"
-            ];
-            ports = [
-              "0.0.0.0:8123:8123"
-              "0.0.0.0:8124:80"
             ];
             environment = {
               TZ = homelab.timeZone;
