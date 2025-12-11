@@ -46,14 +46,14 @@ in
         '';
       };
     };
-    systemd = {
-      tmpfiles.rules = [
-        "d ${cfg.dataDir} 0777 ${homelab.user} ${homelab.group} -"
+    environment.persistence."/" = {
+      directories = [
+        { directory = cfg.dataDir; user = homelab.user; group = homelab.group; mode = "0777"; }
       ];
-      services.${service}.serviceConfig = {
-        ExecStart = lib.mkForce "${lib.getExe config.services.${service}.package} -nobrowser -data=${cfg.dataDir}";
-        ReadWritePaths = [ cfg.dataDir ];
-      };
+    };
+    systemd.services.${service}.serviceConfig = {
+      ExecStart = lib.mkForce "${lib.getExe config.services.${service}.package} -nobrowser -data=${cfg.dataDir}";
+      ReadWritePaths = [ cfg.dataDir ];
     };
   };
 }

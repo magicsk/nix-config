@@ -41,7 +41,7 @@ in
         config = {
           DOMAIN = "https://${cfg.url}";
           SIGNUPS_ALLOWED = false;
-          ROCKET_ADDRESS = "127.0.0.1";
+          ROCKET_ADDRESS = "0.0.0.0";
           ROCKET_PORT = 8222;
           EXTENDED_LOGGING = true;
           LOG_LEVEL = "warn";
@@ -56,14 +56,12 @@ in
         '';
       };
     };
-    systemd = {
-      services.${service}.serviceConfig = {
-        ReadWritePaths = [ cfg.dataDir ];
-      };
-      tmpfiles.rules = [
-        "d ${cfg.dataDir} 0777 ${homelab.user} ${homelab.group} -"
-      ];
+    systemd.services.${service}.serviceConfig = {
+      ReadWritePaths = [ cfg.dataDir ];
     };
+    environment.persistence."/".directories = [
+      { directory = cfg.dataDir; user = homelab.user; group = homelab.group; mode = "0777"; }
+    ];
   };
 
 }

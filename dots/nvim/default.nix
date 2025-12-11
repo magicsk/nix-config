@@ -8,7 +8,7 @@ let
   coc = import ./coc.nix;
 in
 {
-  imports = [ inputs.nixvim.homeManagerModules.nixvim ];
+  imports = [ inputs.nixvim.homeModules.nixvim ];
 
   home.packages = with pkgs; [
     figlet

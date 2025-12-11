@@ -51,11 +51,9 @@ in
         '';
       };
     };
-    systemd = {
-      tmpfiles.rules = [
-        "d ${cfg.dataDir} 0777 ${homelab.user} ${homelab.group} -"
-      ];
-    };
+    environment.persistence."/".directories = [
+      { directory = cfg.dataDir; user = homelab.user; group = homelab.group; mode = "0777"; }
+    ];
   };
 
 }

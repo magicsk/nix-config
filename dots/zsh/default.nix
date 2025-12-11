@@ -59,7 +59,6 @@
         api = "ssh ubuntu@132.226.217.72";
         alumentum = "cd /mnt/Alumentum";
         nitor = "cd /mnt/Nitor";
-        tallow = "cd /mnt/Tallow";
         wilson = "cd /mnt/Wilson";
         services = "cd /persist/opt/services/";
       };

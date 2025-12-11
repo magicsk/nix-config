@@ -15,6 +15,13 @@ in
 {
   nixpkgs.config.packageOverrides = pkgs: {
     vaapiIntel = pkgs.vaapiIntel.override { enableHybridCodec = true; };
+    python312Packages = pkgs.python312Packages.override {
+      overrides = self: super: {
+        psycopg = super.psycopg.overridePythonAttrs (oldAttrs: {
+          doCheck = false; 
+        });
+      };
+    };
   };
   hardware = {
     enableRedistributableFirmware = true;
@@ -129,6 +136,7 @@ in
     parted
     btrfs-progs
     wireguard-tools
+    dua
   ];
 
 /*   tg-notify = {

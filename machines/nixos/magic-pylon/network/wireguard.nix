@@ -10,7 +10,7 @@ let
   wgPublicKeyPath = "${wgKeyDir}/public.key";
 in
 {
-  persistence."/persist" = {
+  environment.persistence."/" = {
     directories = [
       { directory = wgKeyDir; user = "root"; group = "root"; mode = "0700"; }
     ];
@@ -44,20 +44,21 @@ in
     before = [ "network-pre.target" ];
     wantedBy = [ "multi-user.target" ];
   };
-  networking = {
-    wg-quick.interfaces.wg0 = {
-      after = [ "generate-wireguard-keys.service" ];
+  networking.wg-quick.interfaces.wg0 = {
       privateKeyFile = wgPrivateKeyPath;
-      address = [ "10.0.0.2/32" ];
+      address = [ "172.16.16.2/32" ];
 
       peers = [
         {
-          publicKey = "mJy1oJ7htHL/oGSJfGs6QhZG59wiqMj//CG0Xyh8MHY=";
+          publicKey = "HlNAlK7fS3xgj7IqRIWpDyE8+fKgWu5cbsl9gif0IwQ=";
           endpoint = "132.226.217.72:51820";
           allowedIPs = [ "0.0.0.0/0" ];
           persistentKeepalive = 25;
         }
       ];
-    };
+  };
+  systemd.services."wg-quick@wg0" = {
+    requires = [ "generate-wireguard-keys.service" ];
+    after = [ "generate-wireguard-keys.service" ];
   };
 }

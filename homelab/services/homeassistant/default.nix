@@ -34,7 +34,11 @@ in
     };
   };
   config = lib.mkIf cfg.enable {
-    systemd.tmpfiles.rules = [ "d ${cfg.configDir} 0775 ${homelab.user} ${homelab.group} - -" ];
+    environment.persistence."/" = {
+      directories = [
+        { directory = cfg.configDir; user = homelab.user; group = homelab.group; mode = "0775"; }
+      ];
+    };
     services.caddy.virtualHosts."${cfg.url}" = {
       useACMEHost = homelab.baseDomain;
       extraConfig = ''
@@ -56,11 +60,10 @@ in
               "${homelab.mounts.Alumentum}:/mnt/Alumentum"
               "${homelab.mounts.Nitor}:/mnt/Nitor"
               "${homelab.mounts.Wilson}:/mnt/Wilson"
-              "${homelab.mounts.Tallow}:/mnt/Tallow"
             ];
             ports = [
-              "127.0.0.1:8123:8123"
-              "127.0.0.1:8124:80"
+              "0.0.0.0:8123:8123"
+              "0.0.0.0:8124:80"
             ];
             environment = {
               TZ = homelab.timeZone;

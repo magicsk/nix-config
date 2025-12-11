@@ -9,11 +9,15 @@ in
     enable = lib.mkEnableOption "Self-hosted photo and video management solution";
     dataDir = lib.mkOption {
       type = lib.types.path;
-      default = "${config.homelab.mounts.config}/${service}";
+      default = "${homelab.mounts.config}/${service}";
     };
     url = lib.mkOption {
       type = lib.types.str;
       default = "photos.${homelab.baseDomain}";
+    };
+    altUrl = lib.mkOption {
+      type = lib.types.str;
+      default = "immich.${homelab.baseDomain}";
     };
     homepage.name = lib.mkOption {
       type = lib.types.str;
@@ -33,10 +37,12 @@ in
     };
   };
   config = lib.mkIf cfg.enable {
-    systemd = {
-      tmpfiles.rules = [ "d ${cfg.dataDir} 0775 ${service} ${homelab.group} - -" ];
-      services.immich-server.serviceConfig.UMask = lib.mkForce "0007";
+    environment.persistence."/" = {
+      directories = [
+        { directory = cfg.dataDir; user = service; group = homelab.group; mode = "0755"; }
+      ];
     };
+    systemd.services.immich-server.serviceConfig.UMask = lib.mkForce "0007";
     fileSystems."${cfg.dataDir}/library" = {
       device = "${config.homelab.mounts.Nitor}/Photos";
       options = [ "bind" ];
@@ -48,13 +54,24 @@ in
     services.${service} = {
       group = homelab.group;
       enable = true;
+      host = "0.0.0.0";
       port = 2283;
       mediaLocation = "${cfg.dataDir}";
     };
     services.caddy.virtualHosts."${cfg.url}" = {
       useACMEHost = homelab.baseDomain;
       extraConfig = ''
-        reverse_proxy http://${config.services.immich.host}:${toString config.services.immich.port}
+        reverse_proxy http://${config.services.immich.host}:${toString config.services.immich.port} {
+          header_up Transfer-Encoding chunked
+        }
+      '';
+    };
+    services.caddy.virtualHosts."${cfg.altUrl}" = {
+      useACMEHost = homelab.baseDomain;
+      extraConfig = ''
+        reverse_proxy http://${config.services.immich.host}:${toString config.services.immich.port} {
+          header_up Transfer-Encoding chunked
+        }
       '';
     };
   };

@@ -1,6 +1,7 @@
 {
   config,
   pkgs,
+  pkgs-unstable,
   lib,
   ...
 }:
@@ -38,6 +39,7 @@ in
   config = lib.mkIf cfg.enable {
     services.${service} = {
       enable = true;
+      package = pkgs-unstable.redlib;
       openFirewall = true;
       address = "127.0.0.1";
       port = 8282;

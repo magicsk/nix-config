@@ -21,9 +21,9 @@ in
       type = lib.types.str;
       default = "magic_sk";
     };
-    configDir = lib.mkOption {
+    dataDir = lib.mkOption {
       type = lib.types.str;
-      default = "/var/lib/${service}";
+      default = "${config.homelab.mounts.config}/${service}";
     };
     url = lib.mkOption {
       type = lib.types.str;
@@ -51,7 +51,7 @@ in
       virtualHosts."${config.services.nextcloud.hostName}" = {
         listen = [
           {
-            addr = "127.0.0.1";
+            addr = "0.0.0.0";
             port = 8083;
           }
         ];
@@ -69,13 +69,19 @@ in
       ];
     };
 
-    systemd.services."nextcloud-setup" = {
-      requires = [ "postgresql.service" ];
-      after = [ "postgresql.service" ];
+    systemd = {
+      tmpfiles.rules = [
+        # "d ${cfg.dataDir} 0777 ${homelab.user} ${homelab.group} -"
+      ];
+      services."nextcloud-setup" = {
+        requires = [ "postgresql.service" ];
+        after = [ "postgresql.service" ];
+      };
     };
 
     services.${service} = {
       enable = true;
+      # home = cfg.dataDir;
       package = pkgs.nextcloud31;
       hostName = "nextcloud";
       configureRedis = true;

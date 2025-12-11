@@ -29,6 +29,10 @@ in
       system = "x86_64-linux";
       specialArgs = {
         inherit inputs;
+        pkgs-unstable = import inputs.nixpkgs-unstable {
+          system = "x86_64-linux";
+          config.allowUnfree = true;
+        };
       };
       modules = [
         ./homelab
@@ -39,6 +43,7 @@ in
         inputs.agenix.nixosModules.default
         ./users/magic_sk
         (homeManagerCfg false [ ])
+        inputs.impermanence.nixosModules.impermanence
       ] ++ extraModules;
     };
   };

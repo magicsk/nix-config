@@ -33,13 +33,6 @@ in
         Path to the Wilson (SSD 2TB, subvolume on system disk)
       '';
     };
-    mounts.Tallow = lib.mkOption {
-      default = "/mnt/Tallow";
-      type = lib.types.path;
-      description = ''
-        Path to the Tallow (SSD 256GB)
-      '';
-    };
     user = lib.mkOption {
       default = "magic_sk";
       type = lib.types.str;

@@ -13,7 +13,6 @@ in
       Alumentum = "/mnt/Alumentum";
       Nitor = "/mnt/Nitor";
       Wilson = "/mnt/Wilson";
-      Tallow = "/mnt/Tallow";
     };
     samba = {
       enable = true;
@@ -27,9 +26,6 @@ in
         };
         Wilson = {
           path = hl.mounts.Wilson;
-        };
-        Tallow = {
-          path = hl.mounts.Tallow;
         };
         config = {
           path = hl.mounts.config;

@@ -76,11 +76,11 @@ in
         '';
       };
     };
-    systemd.tmpfiles.rules = [
-      "d ${homelab.mounts.Nitor}/Documents/Paperless 0777 ${homelab.user} ${homelab.group} - -"
-      "d ${cfg.dataDir} 0777 ${homelab.user} ${homelab.group} - -"
-      "d ${cfg.mediaDir} 0777 ${homelab.user} ${homelab.group} - -"
-      "d ${cfg.consumptionDir} 0777 ${homelab.user} ${homelab.group} - -"
+    environment.persistence."/".directories = [
+      { directory = "${homelab.mounts.Nitor}/Documents/Paperless 0777"; user = homelab.user; group = homelab.group; mode = "0777"; }
+      { directory = cfg.dataDir; user = homelab.user; group = homelab.group; mode = "0777"; }
+      { directory = cfg.mediaDir; user = homelab.user; group = homelab.group; mode = "0777"; }
+      { directory = cfg.consumptionDir; user = homelab.user; group = homelab.group; mode = "0777"; }
     ];
   };
 }
