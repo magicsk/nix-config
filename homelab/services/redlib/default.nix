@@ -1,8 +1,8 @@
 {
   config,
   pkgs,
-  pkgs-unstable,
   lib,
+  pkgs-unstable,
   ...
 }:
 let
@@ -44,6 +44,19 @@ in
       address = "127.0.0.1";
       port = 8282;
     };
+
+    users.groups.redlib = {};
+    users.users.redlib = {
+      group = "redlib";
+      isSystemUser = true;
+      uid = 994;
+    };
+    systemd.services.${service}.serviceConfig = {
+      DynamicUser = lib.mkForce false;
+      User = "redlib";
+      Group = "redlib";
+    };
+
     services.caddy.virtualHosts."${cfg.url}" = {
       useACMEHost = homelab.baseDomain;
       extraConfig = ''

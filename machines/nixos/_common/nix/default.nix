@@ -8,10 +8,13 @@
   nix.optimise.automatic = true;
   nix.optimise.dates = [ "weekly" ];
 
-  nix.settings.experimental-features = lib.mkDefault [
-    "nix-command"
-    "flakes"
-  ];
+  nix.settings = {
+    download-buffer-size = 134217728;
+    experimental-features = lib.mkDefault [
+      "nix-command"
+      "flakes"
+    ];
+  };
 
   nixpkgs = {
     config = {

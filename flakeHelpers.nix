@@ -33,6 +33,7 @@ in
           system = "x86_64-linux";
           config.allowUnfree = true;
         };
+        redlib-pkg = inputs.redlib-flake.packages.x86_64-linux.default;
       };
       modules = [
         ./homelab
