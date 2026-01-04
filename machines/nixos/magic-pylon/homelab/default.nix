@@ -89,6 +89,7 @@ in
         passSudoFile = config.age.secrets.codeServerSudoPassword.path;
       };
       esphome.enable = true;
+      otbr.enable = true;
       /* audiobookshelf.enable = true; */
     };
   };

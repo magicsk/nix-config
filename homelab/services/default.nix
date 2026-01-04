@@ -50,6 +50,7 @@
     nixpkgs.config.permittedInsecurePackages = [
       "dotnet-sdk-6.0.428"
       "aspnetcore-runtime-6.0.36"
+      "python3.12-ecdsa-0.19.1"
     ];
     virtualisation.podman = {
       dockerCompat = true;
@@ -84,6 +85,7 @@
     ./jellyfin
     ./mosquitto
     ./nextcloud
+    ./otbr
     ./paperless-ngx
     ./qbittorrent
     ./redlib
