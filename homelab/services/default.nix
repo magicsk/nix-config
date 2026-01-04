@@ -83,6 +83,7 @@
     ./homepage
     ./immich
     ./jellyfin
+    ./matter-server
     ./mosquitto
     ./nextcloud
     ./otbr

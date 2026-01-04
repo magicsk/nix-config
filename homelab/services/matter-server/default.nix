@@ -1,63 +1,67 @@
 { config, lib, ... }:
 let
   homelab = config.homelab;
-  cfg = config.homelab.services.otbr;
+  cfg = config.homelab.services.matter-server;
 in
 {
-  options.homelab.services.otbr = {
+  options.homelab.services.matter-server = {
     enable = lib.mkEnableOption {
-      description = "Enable OpenThread Border Router";
+      description = "Enable Matter Server (Python Matter Server)";
     };
     configDir = lib.mkOption {
       type = lib.types.str;
-      default = "${homelab.mounts.config}/otbr";
+      default = "${homelab.mounts.config}/matter-server";
     };
     url = lib.mkOption {
       type = lib.types.str;
-      default = "otbr.${homelab.baseDomain}";
+      default = "matter.${homelab.baseDomain}";
     };
   };
   config = lib.mkIf cfg.enable {
     networking.firewall = {
-      allowedUDPPorts = [ 61631 ];
+      allowedUDPPorts = [ 5353 5540 ];
     };
+
+    boot.kernel.sysctl = {
+      # Enable IPv6 Forwarding so packets can move between br0 and wpan0
+      "net.ipv6.conf.all.forwarding" = 1;
+      "net.ipv4.conf.all.forwarding" = 1;
+
+      # Ensure the server accepts Router Advertisements even with forwarding enabled
+      "net.ipv6.conf.all.accept_ra" = 2;
+      "net.ipv6.conf.br0.accept_ra" = 2;
+
+      # Optimize multicast handling for Matter/mDNS
+      "net.ipv6.conf.all.mldv2_force_sysctl" = 1;
+    };
+
     environment.persistence."/" = {
       directories = [
         { directory = cfg.configDir; user = "root"; group = "root"; mode = "0755"; }
       ];
     };
+
     services.caddy.virtualHosts."${cfg.url}" = {
       useACMEHost = homelab.baseDomain;
       extraConfig = ''
-        reverse_proxy http://127.0.0.1:8081
+        reverse_proxy http://127.0.0.1:5580
       '';
     };
+
     virtualisation = {
       podman.enable = true;
       oci-containers = {
         containers = {
-          otbr = {
-            image = "openthread/border-router:latest";
+          matter-server = {
+            image = "home-assistant-libs/python-matter-server:stable";
             autoStart = true;
             extraOptions = [
               "--pull=newer"
               "--network=host"
-              "--privileged"
-              "--cap-add=NET_ADMIN"
-              "--device=/dev/serial/by-id/usb-1a86_USB_Single_Serial_58CF091384-if00:/dev/ttyACM0"
-              "--device=/dev/net/tun:/dev/net/tun"
             ];
             volumes = [
               "${cfg.configDir}:/data"
             ];
-            environment = {
-              OT_RCP_DEVICE = "spinel+hdlc+uart:///dev/ttyACM0?uart-baudrate=460800";
-              OT_INFRA_IF = "br0";
-              OT_THREAD_IF = "wpan0";
-              OT_REST_LISTEN_ADDR = "0.0.0.0";
-              OT_REST_LISTEN_PORT = "8081";
-              OT_LOG_LEVEL = "7";
-            };
           };
         };
       };

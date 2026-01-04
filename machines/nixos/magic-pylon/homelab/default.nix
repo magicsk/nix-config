@@ -90,6 +90,7 @@ in
       };
       esphome.enable = true;
       otbr.enable = true;
+      matter-server.enable = true;
       /* audiobookshelf.enable = true; */
     };
   };
