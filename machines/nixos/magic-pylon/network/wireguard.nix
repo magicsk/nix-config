@@ -56,8 +56,14 @@ in
           persistentKeepalive = 25;
         }
       ];
+      postUp = ''
+        ${pkgs.iproute2}/bin/ip rule add uidrange 994-994 table main
+      '';
+      preDown = ''
+        ${pkgs.iproute2}/bin/ip rule del uidrange 994-994 table main
+      '';
   };
-  systemd.services."wg-quick@wg0" = {
+  systemd.services."wg-quick-wg0" = {
     requires = [ "generate-wireguard-keys.service" ];
     after = [ "generate-wireguard-keys.service" ];
   };
