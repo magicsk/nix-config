@@ -137,6 +137,7 @@ in
     btrfs-progs
     wireguard-tools
     dua
+    unzip
   ];
 
 /*   tg-notify = {
