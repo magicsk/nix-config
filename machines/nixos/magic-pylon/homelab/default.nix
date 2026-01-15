@@ -91,6 +91,7 @@ in
       esphome.enable = true;
       otbr.enable = true;
       matter-server.enable = true;
+      minecraft.enable = true;
       /* audiobookshelf.enable = true; */
     };
   };

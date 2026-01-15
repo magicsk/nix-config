@@ -84,6 +84,7 @@
     ./immich
     ./jellyfin
     ./matter-server
+    ./minecraft
     ./mosquitto
     ./nextcloud
     ./otbr

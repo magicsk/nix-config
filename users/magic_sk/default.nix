@@ -17,6 +17,7 @@
           "video"
           "podman"
           "input"
+          "minecraft"
         ];
         group = "magic_sk";
         openssh.authorizedKeys.keys = [
