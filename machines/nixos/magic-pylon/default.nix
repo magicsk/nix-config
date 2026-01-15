@@ -117,7 +117,7 @@ in
     ];
   }; */
 
-  services.auto-aspm.enable = true;
+  services.autoaspm.enable = true;
   powerManagement.powertop.enable = true;
 
   environment.systemPackages = with pkgs; [

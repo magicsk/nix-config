@@ -39,9 +39,9 @@ in
         ./homelab
         ./machines/nixos/_common
         ./machines/nixos/${machineHostname}
-        ./modules/auto-aspm
         ./modules/qbittorrent
         inputs.agenix.nixosModules.default
+        inputs.autoaspm.nixosModules.default
         ./users/magic_sk
         (homeManagerCfg false [ ])
         inputs.impermanence.nixosModules.impermanence

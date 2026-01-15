@@ -18,9 +18,7 @@ in
     };
   };
   config = lib.mkIf cfg.enable {
-    networking.firewall = {
-      allowedUDPPorts = [ 61631 ];
-    };
+    networking.firewall.allowedUDPPorts = [ 61631 ];
     environment.persistence."/" = {
       directories = [
         { directory = cfg.configDir; user = "root"; group = "root"; mode = "0755"; }
@@ -56,7 +54,7 @@ in
               OT_THREAD_IF = "wpan0";
               OT_REST_LISTEN_ADDR = "0.0.0.0";
               OT_REST_LISTEN_PORT = "8081";
-              OT_LOG_LEVEL = "7";
+              OT_LOG_LEVEL = "2";
             };
           };
         };

@@ -24,9 +24,9 @@
       url = "github:nix-community/home-manager/release-25.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    auto-aspm = {
-      url = "github:notthebee/AutoASPM";
-      flake = false;
+    autoaspm = {
+      url = "git+https://git.notthebe.ee/notthebee/AutoASPM";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
     agenix = {
       url = "github:ryantm/agenix";

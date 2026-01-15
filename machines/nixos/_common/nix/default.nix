@@ -13,7 +13,12 @@
     experimental-features = lib.mkDefault [
       "nix-command"
       "flakes"
+      "auto-allocate-uids"
+      "cgroups"
     ];
+    cores = 0;
+    max-jobs = "auto";
+    auto-optimise-store = true;
   };
 
   nixpkgs = {
