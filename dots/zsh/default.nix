@@ -6,7 +6,10 @@
   ...
 }:
 {
-  home.packages = with pkgs; [ grc ];
+  home.packages = with pkgs; [
+    grc
+    zsh-completions
+  ];
 
   programs = {
     command-not-found.enable = false;
@@ -21,17 +24,21 @@
     };
     zsh = {
       enable = true;
-      enableCompletion = false;
-      zplug = {
-        enable = true;
-        plugins = [
-          { name = "zsh-users/zsh-autosuggestions"; }
-          { name = "zsh-users/zsh-syntax-highlighting"; }
-          { name = "zsh-users/zsh-completions"; }
-          { name = "zsh-users/zsh-history-substring-search"; }
-          { name = "unixorn/warhol.plugin.zsh"; }
-        ];
-      };
+      enableCompletion = true;
+      autosuggestions.enable = true;
+      syntaxHighlighting.enable = true;
+
+      plugins = [
+        {
+          name = "zsh-history-substring-search";
+          src = pkgs.zsh-history-substring-search;
+          file = "share/zsh-history-substring-search/zsh-history-substring-search.zsh";
+        }
+        {
+          name = "warhol";
+          src = inputs.warhol;
+        }
+      ];
       shellAliases = {
         la = "ls --color -lha";
         df = "df -h";
@@ -82,7 +89,7 @@
         export LC_CTYPE=en_US.UTF-8
         export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
 
-        source $ZPLUG_HOME/repos/unixorn/warhol.plugin.zsh/warhol.plugin.zsh
+        # Plugins are now managed by Nix/Home Manager
         bindkey '^[[A' history-substring-search-up
         bindkey '^[[B' history-substring-search-down
 

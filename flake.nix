@@ -42,6 +42,10 @@
     };
     deploy-rs.url = "github:serokell/deploy-rs";
     impermanence.url = "github:nix-community/impermanence";
+    warhol = {
+      url = "github:unixorn/warhol.plugin.zsh";
+      flake = false;
+    };
   };
 
   outputs =
