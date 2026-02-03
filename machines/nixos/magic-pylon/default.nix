@@ -13,16 +13,19 @@ let
   ];
 in
 {
-  nixpkgs.config.packageOverrides = pkgs: {
-    vaapiIntel = pkgs.vaapiIntel.override { enableHybridCodec = true; };
-    python312Packages = pkgs.python312Packages.override {
-      overrides = self: super: {
-        psycopg = super.psycopg.overridePythonAttrs (oldAttrs: {
-          doCheck = false; 
-        });
-      };
-    };
-  };
+  nixpkgs.overlays = [
+    (final: prev: {
+      vaapiIntel = prev.vaapiIntel.override { enableHybridCodec = true; };
+      pythonPackagesExtensions = prev.pythonPackagesExtensions ++ [
+        (python-final: python-prev: {
+          psycopg = python-prev.psycopg.overridePythonAttrs (oldAttrs: {
+            doCheck = false;
+            pythonImportsCheck = [ "psycopg" "psycopg_c" ];
+          });
+        })
+      ];
+    })
+  ];
   hardware = {
     enableRedistributableFirmware = true;
     cpu.intel.updateMicrocode = true;
