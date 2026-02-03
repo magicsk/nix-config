@@ -15,28 +15,35 @@ in
   ];
 
   fileSystems."/" = lib.mkDefault {
-      device = "/dev/disk/by-uuid/caa3ae9c-92aa-4a2a-b4b4-06ac762cd838";
+      device = "/dev/disk/by-uuid/6f435018-a490-421d-8c80-e422ddd9d0ea";
       fsType = "btrfs";
       options = [ "subvol=root" "compress=zstd" ];
       neededForBoot = true;
     };
     
   fileSystems."/nix" = lib.mkDefault {
-      device = "/dev/disk/by-uuid/caa3ae9c-92aa-4a2a-b4b4-06ac762cd838";
+      device = "/dev/disk/by-uuid/6f435018-a490-421d-8c80-e422ddd9d0ea";
       fsType = "btrfs";
       options = [ "subvol=nix" "compress=zstd" ];
       neededForBoot = true;
     };
+    
+  fileSystems."/var/log" = lib.mkDefault {
+      device = "/dev/disk/by-uuid/6f435018-a490-421d-8c80-e422ddd9d0ea";
+      fsType = "btrfs";
+      options = [ "subvol=log" "compress=zstd" ];
+      neededForBoot = true;
+    };
 
   fileSystems."/home" = lib.mkDefault {
-      device = "/dev/disk/by-uuid/caa3ae9c-92aa-4a2a-b4b4-06ac762cd838";
+      device = "/dev/disk/by-uuid/6f435018-a490-421d-8c80-e422ddd9d0ea";
       fsType = "btrfs";
       options = [ "subvol=home" "compress=zstd" "noatime" "space_cache=v2" ];
       neededForBoot = true;
     };
 
   fileSystems."/mnt/Wilson" = lib.mkDefault {
-      device = "/dev/disk/by-uuid/caa3ae9c-92aa-4a2a-b4b4-06ac762cd838";
+      device = "/dev/disk/by-uuid/6f435018-a490-421d-8c80-e422ddd9d0ea";
       fsType = "btrfs";
       options = [ "subvol=persistant" "compress=zstd:2" "noatime" "space_cache=v2" ];
     };
@@ -54,14 +61,14 @@ in
     };
 
   fileSystems."/boot" = lib.mkDefault {
-      device = "/dev/disk/by-uuid/70C2-0726";
+      device = "/dev/disk/by-uuid/D509-1B5A";
       fsType = "vfat";
       options = [ "fmask=0022" "dmask=0022" ];
       neededForBoot = true;
     };
 
   fileSystems."/swap" = lib.mkDefault {
-      device = "/dev/disk/by-uuid/caa3ae9c-92aa-4a2a-b4b4-06ac762cd838";
+      device = "/dev/disk/by-uuid/6f435018-a490-421d-8c80-e422ddd9d0ea";
       fsType = "btrfs";
       options = [ "subvol=swap" "noatime" ];
       neededForBoot = true;
@@ -92,3 +99,4 @@ in
   # };
 
 }
+
