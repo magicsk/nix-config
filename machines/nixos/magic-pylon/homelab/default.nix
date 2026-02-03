@@ -75,7 +75,7 @@ in
       sonarr.enable = true;
       radarr.enable = true;
       prowlarr.enable = true;
-      jellyseerr.enable = true;
+      jellyseerr.enable = false;
       nextcloud = {
         enable = true;
         adminpassFile = config.age.secrets.nextcloudAdminPassword.path;
@@ -91,7 +91,7 @@ in
       esphome.enable = true;
       otbr.enable = true;
       matter-server.enable = true;
-      minecraft.enable = true;
+      minecraft.enable = false;
       /* audiobookshelf.enable = true; */
     };
   };
