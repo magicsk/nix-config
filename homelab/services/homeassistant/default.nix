@@ -50,14 +50,18 @@ in
       oci-containers = {
         containers = {
           homeassistant = {
-            image = "homeassistant/home-assistant:stable";
+            image = "linuxserver/homeassistant:latest";
             autoStart = true;
             extraOptions = [
               "--pull=newer"
               "--network=host"
+              # "--privileged"
+              "--cap-add=NET_ADMIN"
+              "--cap-add=NET_RAW"
             ];
             volumes = [
               "${cfg.configDir}:/config"
+              "${homelab.mounts.Nitor}/Backups/hass:/config/backups"
               "${homelab.mounts.Alumentum}:/mnt/Alumentum"
               "${homelab.mounts.Nitor}:/mnt/Nitor"
               "${homelab.mounts.Wilson}:/mnt/Wilson"
