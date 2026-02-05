@@ -76,7 +76,8 @@
     ./arr/radarr
     #./arr/lidarr
     # ./audiobookshelf
-    # ./backup
+    ./backup
+    ./borg-ui
     ./code-server
     ./esphome
     ./homeassistant
@@ -89,8 +90,10 @@
     ./nextcloud
     ./otbr
     ./paperless-ngx
+    ./postgresql
     ./qbittorrent
     ./redlib
+    ./redis
     # ./uptime-kuma
     ./vaultwarden
     ./zigbee2mqtt

@@ -141,6 +141,8 @@ in
     wireguard-tools
     dua
     unzip
+    borgbackup
+    immich-cli
   ];
 
 /*   tg-notify = {

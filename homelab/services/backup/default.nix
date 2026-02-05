@@ -8,200 +8,106 @@ let
   cfg = config.homelab.services.backup;
   hl = config.homelab;
 in
-
 {
   options.homelab.services.backup = {
-    enable = lib.mkEnableOption {
-      description = "Enable backups for application state folders and/or Paperless documents";
+    enable = lib.mkEnableOption "BorgBackup service for mirroring selected folders with versioning";
+
+    folders = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [ "${hl.mounts.Nitor}/Photos" ];
+      description = "List of absolute paths on Nitor to backup to Alumentum";
     };
-    state.enable = lib.mkOption {
-      description = "Enable backups for application state folders";
-      type = lib.types.bool;
-      default = false;
+
+    exclude = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [ ];
+      description = "List of patterns to exclude from the main backup";
     };
-    configDir = lib.mkOption {
-      description = "Folder with database dump backups (called configDir for compatibility reasons)";
-      type = lib.types.str;
-      default = "/var/backup";
-    };
-    paperless.enable = lib.mkOption {
-      description = "Enable backups for Paperless documents";
-      type = lib.types.bool;
-      default = false;
-    };
-    passwordFile = lib.mkOption {
-      description = "File with password to the Restic repository";
+
+    repoPath = lib.mkOption {
       type = lib.types.path;
+      default = "${hl.mounts.Alumentum}/Backups";
+      description = "Destination repository path for the main backup";
     };
-    s3.enable = lib.mkOption {
-      description = "Enable S3 backups for application state directories";
-      default = false;
-      type = lib.types.bool;
-    };
-    s3.url = lib.mkOption {
-      description = "URL of the S3-compatible endpoint to send the backups to";
-      default = "";
-      type = lib.types.str;
-    };
-    s3.environmentFile = lib.mkOption {
-      description = "File with S3 credentials";
-      type = lib.types.path;
-      example = lib.literalExpression ''
-        pkgs.writeText "restic-s3-environment" '''
-          AWS_DEFAULT_REGION=us-east-3
-          AWS_ACCESS_KEY_ID=3u7heDiN4GGfuE8ocqLwS1d5zhy6I
-          AWS_SECRET_ACCESS_KEY=3s3W4yCG5UDOzs1TMCohE6sc71U
-        '''
-      '';
-    };
-    local.enable = lib.mkOption {
-      description = "Enable local backups for application state directories";
-      default = false;
-      type = lib.types.bool;
-    };
-    local.targetDir = lib.mkOption {
-      description = "Target path for local Restic backups";
-      default = "${hl.mounts.merged}/Backups/Restic";
-      type = lib.types.path;
+
+    configBackup = {
+      enable = lib.mkEnableOption "Backup of service configurations to Nitor";
+      target = lib.mkOption {
+        type = lib.types.path;
+        default = "${hl.mounts.Nitor}/Backups/Services";
+        description = "Where to store service config backups on Nitor";
+      };
+      exclude = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
+        default = [ ];
+        description = "List of patterns to exclude from the config backup";
+      };
     };
   };
-  config =
-    let
-      enabledServices = (
-        lib.attrsets.filterAttrs (
-          name: value: value ? configDir && value ? enable && value.enable
-        ) hl.services
-      );
-      stateDirs = lib.strings.concatMapStrings (x: x + " ") (
-        lib.lists.forEach (lib.attrsets.mapAttrsToList (name: value: name) enabledServices) (
-          x:
-          lib.attrsets.attrByPath [
-            x
-            "configDir"
-          ] false enabledServices
-        )
-      );
-    in
-    lib.mkIf (cfg.enable && enabledServices != { }) {
-      systemd.tmpfiles.rules = lib.lists.optionals cfg.local.enable [
-        "d ${cfg.local.targetDir} 0770 ${hl.user} ${hl.group} - -"
-      ];
-      users.users.restic.createHome = lib.mkForce false;
-      systemd.services.restic-rest-server.serviceConfig = lib.attrsets.optionalAttrs cfg.local.enable {
-        User = lib.mkForce hl.user;
-        Group = lib.mkForce hl.group;
-      };
-      services.postgresqlBackup = {
-        enable = config.services.postgresql.enable;
-        databases = config.services.postgresql.ensureDatabases;
-      };
-      services.mysqlBackup = {
-        enable = config.services.mysql.enable;
-        databases = config.services.mysql.ensureDatabases;
-      };
-      services.restic = {
-        server = lib.attrsets.optionalAttrs cfg.local.enable {
-          enable = true;
-          dataDir = cfg.local.targetDir;
-          extraFlags = [
-            "--no-auth"
-          ];
+
+  config = lib.mkIf cfg.enable {
+    systemd.tmpfiles.rules = [
+      "d ${cfg.repoPath} 0775 ${hl.user} ${hl.group} -"
+      "d ${cfg.configBackup.target} 0775 ${hl.user} ${hl.group} -"
+    ];
+
+    # Keep the built-in DB backup services alive if they are in use
+    services.postgresqlBackup = {
+      enable = config.services.postgresql.enable;
+      databases = config.services.postgresql.ensureDatabases;
+    };
+    services.mysqlBackup = {
+      enable = config.services.mysql.enable;
+      databases = config.services.mysql.ensureDatabases;
+    };
+
+    services.borgbackup.jobs = {
+      # Job 1: Configs -> Nitor
+      services-to-nitor = lib.mkIf cfg.configBackup.enable {
+        user = hl.user;
+        group = hl.group;
+        paths = [ hl.mounts.config ];
+        repo = cfg.configBackup.target;
+        exclude = cfg.configBackup.exclude;
+        encryption.mode = "none";
+        compression = "auto,zstd";
+        startAt = "daily";
+        doInit = true;
+        preHook = ''
+          if [ ! -d "${cfg.configBackup.target}/config" ]; then
+            ${pkgs.borgbackup}/bin/borg init --encryption=none "${cfg.configBackup.target}" || true
+          fi
+          chown -R ${hl.user}:${hl.group} "${cfg.configBackup.target}" || true
+        '';
+        prune.keep = {
+          daily = 7;
+          weekly = 4;
         };
-        backups =
-          lib.attrsets.optionalAttrs cfg.local.enable {
-            appdata-local = {
-              timerConfig = {
-                OnCalendar = "Mon..Sat *-*-* 05:00:00";
-                Persistent = true;
-              };
-              repository = "rest:http://localhost:8000/appdata-local-${config.networking.hostName}";
-              initialize = true;
-              passwordFile = cfg.passwordFile;
-              pruneOpts = [
-                "--keep-last 5"
-              ];
-              exclude = [
-              ];
-              paths = [
-                "/tmp/appdata-local-${config.networking.hostName}.tar"
-              ];
-              backupPrepareCommand =
-                let
-                  restic = "${pkgs.restic}/bin/restic -r '${config.services.restic.backups.appdata-local.repository}' -p ${cfg.passwordFile}";
-                in
-                ''
-                  ${restic} stats || ${restic} init
-                  ${pkgs.restic}/bin/restic forget --prune --no-cache --keep-last 5
-                  ${pkgs.gnutar}/bin/tar -cf /tmp/appdata-local-${config.networking.hostName}.tar ${stateDirs}
-                  ${restic} unlock
-                '';
-            };
-          }
-          // lib.attrsets.optionalAttrs cfg.s3.enable {
-            appdata-s3 =
-              let
-                backupFolder = "appdata-${config.networking.hostName}";
-              in
-              {
-                timerConfig = {
-                  OnCalendar = "Sun *-*-* 05:00:00";
-                  Persistent = true;
-                };
-                environmentFile = cfg.s3.environmentFile;
-                repository = "s3:${cfg.s3.url}/${backupFolder}";
-                initialize = true;
-                passwordFile = cfg.passwordFile;
-                pruneOpts = [
-                  "--keep-last 3"
-                ];
-                exclude = [
-                ];
-                paths = [
-                  "/tmp/appdata-s3-${config.networking.hostName}.tar"
-                ];
-                backupPrepareCommand =
-                  let
-                    restic = "${pkgs.restic}/bin/restic -r '${config.services.restic.backups.appdata-s3.repository}'";
-                  in
-                  ''
-                    ${restic} stats || ${restic} init
-                    ${pkgs.restic}/bin/restic forget --prune --no-cache --keep-last 3
-                    ${pkgs.gnutar}/bin/tar -cf /tmp/appdata-s3-${config.networking.hostName}.tar ${stateDirs}
-                    ${restic} unlock
-                  '';
-              };
-          }
-          // lib.attrsets.optionalAttrs (cfg.s3.enable && hl.services.paperless.enable) {
-            paperless-s3 =
-              let
-                backupFolder = "paperless-${config.networking.hostName}";
-              in
-              {
-                timerConfig = {
-                  OnCalendar = "Sun *-*-* 05:00:00";
-                  Persistent = true;
-                };
-                environmentFile = cfg.s3.environmentFile;
-                repository = "s3:${cfg.s3.url}/${backupFolder}";
-                initialize = true;
-                passwordFile = cfg.passwordFile;
-                pruneOpts = [
-                  "--keep-last 5"
-                ];
-                paths = [
-                  hl.services.paperless.mediaDir
-                ];
-                backupPrepareCommand =
-                  let
-                    restic = "${pkgs.restic}/bin/restic -r '${config.services.restic.backups.paperless-s3.repository}'";
-                  in
-                  ''
-                    ${restic} stats || ${restic} init
-                    ${pkgs.restic}/bin/restic forget --prune --no-cache --keep-last 3
-                    ${restic} unlock
-                  '';
-              };
-          };
+      };
+
+      # Job 2: Nitor -> Alumentum
+      nitor-to-alumentum = {
+        user = hl.user;
+        group = hl.group;
+        paths = cfg.folders;
+        repo = cfg.repoPath;
+        exclude = cfg.exclude;
+        encryption.mode = "none";
+        compression = "auto,zstd";
+        startAt = "daily";
+        doInit = true;
+        preHook = ''
+          if [ ! -d "${cfg.repoPath}/config" ]; then
+            ${pkgs.borgbackup}/bin/borg init --encryption=none "${cfg.repoPath}" || true
+          fi
+          chown -R ${hl.user}:${hl.group} "${cfg.repoPath}" || true
+        '';
+        prune.keep = {
+          daily = 7;
+          weekly = 4;
+          monthly = 6;
+        };
       };
     };
+  };
 }

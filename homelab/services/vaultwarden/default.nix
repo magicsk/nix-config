@@ -40,7 +40,7 @@ in
         enable = true;
         config = {
           DOMAIN = "https://${cfg.url}";
-          SIGNUPS_ALLOWED = false;
+          SIGNUPS_ALLOWED = true;
           ROCKET_ADDRESS = "0.0.0.0";
           ROCKET_PORT = 8222;
           EXTENDED_LOGGING = true;

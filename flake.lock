@@ -340,7 +340,8 @@
         "nixpkgs": "nixpkgs_3",
         "nixpkgs-unstable": "nixpkgs-unstable",
         "nixvim": "nixvim",
-        "secrets": "secrets"
+        "secrets": "secrets",
+        "warhol": "warhol"
       }
     },
     "secrets": {
@@ -435,6 +436,22 @@
       "original": {
         "owner": "numtide",
         "repo": "flake-utils",
+        "type": "github"
+      }
+    },
+    "warhol": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1767397383,
+        "narHash": "sha256-AVCxzfqYutQbzYxtrTRzqE1thkO6K/i5YHezvIKHdcI=",
+        "owner": "unixorn",
+        "repo": "warhol.plugin.zsh",
+        "rev": "cbab1ec5b9069b827462fae5faa4e3ebfc5ceef3",
+        "type": "github"
+      },
+      "original": {
+        "owner": "unixorn",
+        "repo": "warhol.plugin.zsh",
         "type": "github"
       }
     }

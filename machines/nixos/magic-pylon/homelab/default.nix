@@ -19,7 +19,7 @@ in
       passwordFile = config.age.secrets.sambaPassword.path;
       shares = {
         Alumentum = {
-          path = "${hl.mounts.Alumentum}/media";
+          path = "${hl.mounts.Alumentum}";
         };
         Nitor = {
           path = hl.mounts.Nitor;
@@ -43,6 +43,29 @@ in
       immich = {
         enable = true;
       };
+      backup = {
+        enable = true;
+        configBackup = {
+          enable = true;
+          exclude = [
+            "${config.homelab.mounts.config}/immich/library"
+          ];
+        };
+        folders = [
+          "${hl.mounts.Nitor}/Backups"
+          "${hl.mounts.Nitor}/Creative"
+          "${hl.mounts.Nitor}/Developer"
+          "${hl.mounts.Nitor}/Documents"
+          "${hl.mounts.Nitor}/Games"
+          "${hl.mounts.Nitor}/Other"
+          "${hl.mounts.Nitor}/Music"
+          "${hl.mounts.Nitor}/Photos"
+          "${hl.mounts.Nitor}/Pictures"
+          "${hl.mounts.Nitor}/Programs"
+          "${hl.mounts.Nitor}/Videos"
+        ];
+      };
+      borg-ui.enable = true;
       homepage = {
         enable = true;
         misc = [
