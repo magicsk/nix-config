@@ -43,6 +43,7 @@ in
     environment.persistence."/" = {
       directories = [
         { directory = cfg.configDir; user = homelab.user; group = homelab.group; mode = "0755"; }
+        { directory = "${homelab.mounts.Wilson}/Developer"; user = homelab.user; group = homelab.group; mode = "0755"; }
       ];
     };
     services.caddy.virtualHosts."${cfg.url}" = {
