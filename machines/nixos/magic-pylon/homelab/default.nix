@@ -44,7 +44,7 @@ in
         enable = true;
       };
       backup = {
-        enable = true;
+        enable = false;
         configBackup = {
           enable = true;
           exclude = [
