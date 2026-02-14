@@ -46,6 +46,7 @@ in
       device = "/dev/disk/by-uuid/6f435018-a490-421d-8c80-e422ddd9d0ea";
       fsType = "btrfs";
       options = [ "subvol=persistant" "compress=zstd:2" "noatime" "space_cache=v2" ];
+      neededForBoot = true;
     };
     
   fileSystems."/mnt/Alumentum" = lib.mkDefault {
@@ -58,6 +59,7 @@ in
       device = "/dev/disk/by-uuid/a85d790f-f428-4be9-ac0f-e40ff7b6f575";
       fsType = "btrfs";
       options = [ "compress=zstd:2" "noatime" "space_cache=v2" ];
+      neededForBoot = true;
     };
 
   fileSystems."/boot" = lib.mkDefault {

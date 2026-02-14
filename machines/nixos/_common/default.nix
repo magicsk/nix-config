@@ -81,6 +81,14 @@
 
   homelab.motd.enable = true;
 
+  environment.persistence."/persist" = {
+    hideMounts = true;
+    directories = [
+      "/var/lib/nixos"
+      "/var/lib/systemd"
+    ];
+  };
+
   environment.systemPackages = with pkgs; [
     wget
     iperf3
