@@ -43,28 +43,6 @@ in
       immich = {
         enable = true;
       };
-      backup = {
-        enable = true;
-        configBackup = {
-          enable = true;
-          exclude = [
-            "${config.homelab.mounts.config}/immich/library"
-          ];
-        };
-        folders = [
-          "${hl.mounts.Nitor}/Backups"
-          "${hl.mounts.Nitor}/Creative"
-          "${hl.mounts.Nitor}/Developer"
-          "${hl.mounts.Nitor}/Documents"
-          "${hl.mounts.Nitor}/Games"
-          "${hl.mounts.Nitor}/Other"
-          "${hl.mounts.Nitor}/Music"
-          "${hl.mounts.Nitor}/Photos"
-          "${hl.mounts.Nitor}/Pictures"
-          "${hl.mounts.Nitor}/Programs"
-          "${hl.mounts.Nitor}/Videos"
-        ];
-      };
       borg-ui.enable = true;
       homepage = {
         enable = true;
@@ -73,7 +51,7 @@ in
             "Router" = {
               href = "http://magic-port.local";
               siteMonitor = "http://magic-port.local";
-              description = "OpenWrt WebUI";
+              description = "OpenWrt";
               icon = "sh-openwrt-light.svg";
             };
           }
@@ -81,8 +59,16 @@ in
             "Access point" = {
               href = "http://wifi-ap.local";
               siteMonitor = "http://wifi-ap.local";
-              description = "WiFi AP WebUI";
+              description = "WiFi AP";
               icon = "mdi-wifi";
+            };
+          }
+          {
+            "ISP Box" = {
+              href = "http://192.168.100.1";
+              siteMonitor = "http://192.168.100.1";
+              description = "ISP Box";
+              icon = "mdi-lan";
             };
           }
         ];
@@ -114,8 +100,10 @@ in
       esphome.enable = true;
       otbr.enable = true;
       matter-server.enable = true;
-      minecraft.enable = false;
-      /* audiobookshelf.enable = true; */
+      minecraft = {
+        enable = false;
+        name = "monifactory";
+      };
     };
   };
 }
