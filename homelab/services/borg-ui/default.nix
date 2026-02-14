@@ -50,8 +50,8 @@ in
         ];
         environment = {
           TZ = homelab.timeZone;
-          PUID = 0;
-          PGID = 0;
+          PUID = "0";
+          PGID = "0";
         };
         ports = [
           "127.0.0.1:8084:8081"
