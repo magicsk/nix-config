@@ -122,6 +122,7 @@ in
     unzip
     borgbackup
     immich-cli
+    claude-code
   ];
 
 /*   tg-notify = {

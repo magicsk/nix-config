@@ -88,6 +88,7 @@
     ./minecraft
     ./mosquitto
     ./nextcloud
+    ./open-webui
     ./otbr
     ./paperless-ngx
     ./postgresql

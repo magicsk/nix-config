@@ -97,6 +97,7 @@ in
         passFile = config.age.secrets.codeServerPassword.path;
         passSudoFile = config.age.secrets.codeServerSudoPassword.path;
       };
+      open-webui.enable = true;
       esphome.enable = true;
       otbr.enable = true;
       matter-server.enable = true;
