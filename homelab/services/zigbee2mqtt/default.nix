@@ -45,12 +45,16 @@ in
       package = pkgs.zigbee2mqtt_2;
       dataDir = cfg.dataDir;
       settings = {
-        homeassistant = true;
+        homeassistant = lib.mkForce true;
         permit_join = true;
-        frontend = true;
-        # not working
-        # host = "127.0.0.1";
-        # port = "8181";
+        frontend = {
+          host = "127.0.0.1";
+          port = 8181;
+          url = "https://${cfg.url}";
+        };
+        advanced = {
+          log_level = "warning";
+        };
         serial = {
           adapter = "ember";
           rtscts = true;
@@ -61,7 +65,7 @@ in
     services.caddy.virtualHosts."${cfg.url}" = {
       useACMEHost = homelab.baseDomain;
       extraConfig = ''
-        reverse_proxy http://127.0.0.1:8080
+        reverse_proxy http://127.0.0.1:8181
       '';
     };
     environment.persistence."/".directories = [
