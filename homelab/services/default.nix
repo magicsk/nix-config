@@ -78,6 +78,7 @@
     # ./audiobookshelf
     ./backup
     ./borg-ui
+    ./claude-wrapper
     ./code-server
     ./esphome
     ./homeassistant

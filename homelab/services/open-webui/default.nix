@@ -47,9 +47,21 @@ in
       stateDir = cfg.dataDir;
       environment = {
         ENABLE_OLLAMA_API = "false";
-        OPENAI_API_BASE_URLS = "http://magic-book-pro.local:8000";
+        OPENAI_API_BASE_URLS = "http://127.0.0.1:8090/v1";
         OPENAI_API_KEYS = "";
       };
+    };
+
+    users.groups.${service} = {};
+    users.users.${service} = {
+      group = service;
+      isSystemUser = true;
+    };
+
+    systemd.services.${service}.serviceConfig = {
+      DynamicUser = lib.mkForce false;
+      User = service;
+      Group = service;
     };
 
     services.caddy.virtualHosts."${cfg.url}" = {
@@ -57,6 +69,12 @@ in
       extraConfig = ''
         reverse_proxy http://127.0.0.1:8086
       '';
+    };
+
+    environment.persistence."/" = {
+      directories = [
+        { directory = cfg.dataDir; user = service; group = service; mode = "0755"; }
+      ];
     };
   };
 }
