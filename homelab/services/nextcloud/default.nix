@@ -81,7 +81,7 @@ in
     services.${service} = {
       enable = true;
       # home = cfg.dataDir;
-      package = pkgs.nextcloud31;
+      package = pkgs.nextcloud32;
       hostName = "nextcloud";
       configureRedis = true;
       caching = {
