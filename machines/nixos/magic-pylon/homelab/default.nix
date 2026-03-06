@@ -97,13 +97,16 @@ in
         passFile = config.age.secrets.codeServerPassword.path;
         passSudoFile = config.age.secrets.codeServerSudoPassword.path;
       };
-      claude-wrapper.enable = true;
+      claude-wrapper = {
+        enable = true;
+        ghcrTokenFile = config.age.secrets.githubPackagesToken.path;
+      };
       open-webui.enable = true;
       esphome.enable = true;
       otbr.enable = true;
       matter-server.enable = true;
       minecraft = {
-        enable = false;
+        enable = true;
         name = "monifactory";
       };
     };
