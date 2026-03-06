@@ -69,6 +69,7 @@
   };
 
   imports = [
+    ./affine
     ./arr/prowlarr
     # ./arr/bazarr
     ./arr/jellyseerr

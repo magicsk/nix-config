@@ -40,9 +40,7 @@ in
     };
     services = {
       enable = true;
-      immich = {
-        enable = true;
-      };
+      immich.enable = true;
       borg-ui.enable = true;
       homepage = {
         enable = true;
@@ -109,6 +107,7 @@ in
         enable = true;
         name = "monifactory";
       };
+      affine.enable = true;
     };
   };
 }
