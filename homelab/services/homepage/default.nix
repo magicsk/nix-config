@@ -1,6 +1,7 @@
 {
   config,
   lib,
+  pkgs-unstable,
   ...
 }:
 let
@@ -41,6 +42,7 @@ in
     services.glances.enable = true;
     services.${service} = {
       enable = true;
+      package = pkgs-unstable.homepage-dashboard;
       environmentFile = builtins.toFile "homepage.env" "HOMEPAGE_ALLOWED_HOSTS=lab.${homelab.baseDomain}";
       customCSS = ''
         body, html {
