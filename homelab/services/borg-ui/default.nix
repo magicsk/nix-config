@@ -45,7 +45,7 @@ in
           "${cfg.dataDir}/cache:/home/borg/.cache/borg"
           "${homelab.mounts.Nitor}:/local/Nitor:rw"
           "${homelab.mounts.Alumentum}:/local/Alumentum:rw"
-          "${homelab.mounts.config}:/local/Services:ro"
+          "${homelab.mounts.config}:/local/Services:rw"
           "/etc/localtime:/etc/localtime:ro"
         ];
         environment = {
