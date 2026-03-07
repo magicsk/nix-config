@@ -9,6 +9,7 @@ in
 {
   imports = [
     ./wireguard.nix
+    ./tailscale.nix
   ];
   networking = {
     useDHCP = false;
