@@ -44,41 +44,60 @@ in
       type = lib.types.str;
       default = "Services";
     };
-
   };
+
   config = lib.mkIf cfg.enable {
-    services = {
-      ${service} = {
-        enable = true;
-        passwordFile = cfg.passwordFile;
-        user = homelab.user;
-        dataDir = cfg.dataDir;
-        mediaDir = cfg.mediaDir;
-        consumptionDir = cfg.consumptionDir;
-        consumptionDirIsPublic = true;
-        settings = {
-          PAPERLESS_CONSUMER_IGNORE_PATTERN = [
-            ".DS_STORE/*"
-            "desktop.ini"
+    virtualisation = {
+      podman.enable = true;
+      oci-containers.containers = {
+        "${service}-redis" = {
+          image = "redis:latest";
+        };
+        ${service} = {
+          image = "ghcr.io/paperless-ngx/paperless-ngx:latest";
+          volumes = [
+            "${cfg.dataDir}/data:/usr/src/paperless/data"
+            "${cfg.mediaDir}:/usr/src/paperless/media"
+            "${cfg.consumptionDir}:/usr/src/paperless/consume"
           ];
-          PAPERLESS_OCR_LANGUAGE = "slk+eng";
-          PAPERLESS_URL = "https://${cfg.url}";
-          PAPERLESS_OCR_USER_ARGS = {
-            optimize = 1;
-            pdfa_image_compression = "lossless";
+          environment = {
+            PAPERLESS_REDIS = "redis://${service}-redis:6379";
+            PAPERLESS_URL = "https://${cfg.url}";
+            PAPERLESS_OCR_LANGUAGE = "slk+eng";
+            PAPERLESS_OCR_LANGUAGES = "slk";
+            PAPERLESS_OCR_USER_ARGS = builtins.toJSON {
+              optimize = 1;
+              pdfa_image_compression = "lossless";
+            };
+            PAPERLESS_CONSUMER_IGNORE_PATTERN = builtins.toJSON [
+              ".DS_STORE/*"
+              "desktop.ini"
+            ];
+            PAPERLESS_CONSUMER_RECURSIVE = "true";
+            USERMAP_UID = "1000";
+            USERMAP_GID = "1000";
           };
+          environmentFiles = [
+            cfg.passwordFile
+          ];
+          ports = [
+            "127.0.0.1:8000:8000"
+          ];
+          dependsOn = [ "${service}-redis" ];
         };
       };
-      caddy.virtualHosts."${cfg.url}" = {
-        useACMEHost = homelab.baseDomain;
-        extraConfig = ''
-          reverse_proxy http://127.0.0.1:${toString config.services.${service}.port}
-        '';
-      };
     };
+
+    services.caddy.virtualHosts."${cfg.url}" = {
+      useACMEHost = homelab.baseDomain;
+      extraConfig = ''
+        reverse_proxy http://127.0.0.1:8000
+      '';
+    };
+
     environment.persistence."/".directories = [
-      { directory = "${homelab.mounts.Nitor}/Documents/Paperless 0777"; user = homelab.user; group = homelab.group; mode = "0777"; }
-      { directory = cfg.dataDir; user = homelab.user; group = homelab.group; mode = "0777"; }
+      { directory = "${homelab.mounts.Nitor}/Documents/Paperless"; user = homelab.user; group = homelab.group; mode = "0777"; }
+      { directory = "${cfg.dataDir}/data"; user = homelab.user; group = homelab.group; mode = "0777"; }
       { directory = cfg.mediaDir; user = homelab.user; group = homelab.group; mode = "0777"; }
       { directory = cfg.consumptionDir; user = homelab.user; group = homelab.group; mode = "0777"; }
     ];
