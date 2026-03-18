@@ -82,6 +82,7 @@
     ./claude-wrapper
     ./code-server
     ./esphome
+    ./go2rtc
     ./homeassistant
     ./homepage
     ./immich
@@ -90,6 +91,7 @@
     ./minecraft
     ./mosquitto
     ./nextcloud
+    ./obico-ml
     ./open-webui
     ./otbr
     ./paperless-ngx
