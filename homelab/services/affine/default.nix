@@ -1,9 +1,10 @@
-{ config, lib, ... }:
+{ config, lib, pkgs, ... }:
 let
   service = "affine";
   cfg = config.homelab.services.${service};
   homelab = config.homelab;
   dbPassword = "affine";
+  affineImage = "ghcr.io/toeverything/affine:stable";
 in
 {
   options.homelab.services.${service} = {
@@ -52,26 +53,12 @@ in
             POSTGRES_INITDB_ARGS = "--data-checksums";
             POSTGRES_HOST_AUTH_METHOD = "trust";
           };
-          extraOptions = [
-            "--network=affine"
-            "--health-cmd=pg_isready -U ${service} -d ${service}"
-            "--health-interval=10s"
-            "--health-timeout=5s"
-            "--health-retries=5"
-          ];
         };
         "${service}-redis" = {
           image = "redis:latest";
-          extraOptions = [
-            "--network=affine"
-            "--health-cmd=redis-cli --raw incr ping"
-            "--health-interval=10s"
-            "--health-timeout=5s"
-            "--health-retries=5"
-          ];
         };
         ${service} = {
-          image = "ghcr.io/toeverything/affine:stable";
+          image = affineImage;
           volumes = [
             "${cfg.dataDir}/storage:/root/.affine/storage"
             "${cfg.dataDir}/config:/root/.affine/config"
@@ -83,53 +70,30 @@ in
             DATABASE_URL = "postgresql://${service}:${dbPassword}@${service}-postgres:5432/${service}";
           };
           ports = [
-            "127.0.0.1:3010:3010"
+            "3010:3010"
           ];
           dependsOn = [
             "${service}-postgres"
             "${service}-redis"
-            "${service}-migration"
-          ];
-          extraOptions = [
-            "--network=affine"
-          ];
-        };
-        "${service}-migration" = {
-          image = "ghcr.io/toeverything/affine:stable";
-          volumes = [
-            "${cfg.dataDir}/storage:/root/.affine/storage"
-            "${cfg.dataDir}/config:/root/.affine/config"
-          ];
-          environment = {
-            AFFINE_INDEXER_ENABLED = "false";
-            REDIS_SERVER_HOST = "${service}-redis";
-            DATABASE_URL = "postgresql://${service}:${dbPassword}@${service}-postgres:5432/${service}";
-          };
-          cmd = [ "sh" "-c" "node ./scripts/self-host-predeploy.js" ];
-          dependsOn = [
-            "${service}-postgres"
-            "${service}-redis"
-          ];
-          extraOptions = [
-            "--network=affine"
           ];
         };
       };
     };
 
-    systemd.services."podman-create-affine-network" = {
-      description = "Create podman network for AFFiNE";
-      after = [ "podman.service" ];
-      wantedBy = [ "multi-user.target" ];
+    systemd.services."podman-${service}" = {
+      requires = [ "${service}-migration.service" ];
+      after = [ "${service}-migration.service" ];
+    };
+
+    systemd.services."${service}-migration" = {
+      description = "AFFiNE database migration";
+      requires = [ "podman-${service}-postgres.service" "podman-${service}-redis.service" ];
+      after = [ "podman-${service}-postgres.service" "podman-${service}-redis.service" ];
       serviceConfig = {
         Type = "oneshot";
-        RemainAfterExit = true;
-        ExecStart = "/run/current-system/sw/bin/podman network create affine --ignore";
+        ExecStart = "${pkgs.podman}/bin/podman run --rm --name ${service}-migration -v ${cfg.dataDir}/storage:/root/.affine/storage -v ${cfg.dataDir}/config:/root/.affine/config -e AFFINE_INDEXER_ENABLED=false -e REDIS_SERVER_HOST=${service}-redis -e 'DATABASE_URL=postgresql://${service}:${dbPassword}@${service}-postgres:5432/${service}' ${affineImage} sh -c 'node ./scripts/self-host-predeploy.js'";
       };
     };
-
-    systemd.services."podman-${service}-postgres".after = [ "podman-create-affine-network.service" ];
-    systemd.services."podman-${service}-redis".after = [ "podman-create-affine-network.service" ];
 
     services.caddy.virtualHosts."${cfg.url}" = {
       useACMEHost = homelab.baseDomain;
