@@ -96,7 +96,7 @@ in
         passSudoFile = config.age.secrets.codeServerSudoPassword.path;
       };
       claude-wrapper = {
-        enable = true;
+        enable = false;
         ghcrTokenFile = config.age.secrets.githubPackagesToken.path;
       };
       open-webui.enable = true;
@@ -108,6 +108,9 @@ in
         name = "monifactory";
       };
       affine.enable = true;
+      flaresolverr.enable = true;
+      go2rtc.enable = true;
+      obico-ml.enable = true;
     };
   };
 }

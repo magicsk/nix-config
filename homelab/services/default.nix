@@ -82,6 +82,7 @@
     ./claude-wrapper
     ./code-server
     ./esphome
+    ./flaresolverr
     ./go2rtc
     ./homeassistant
     ./homepage
