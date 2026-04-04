@@ -100,6 +100,7 @@
     ./qbittorrent
     ./redlib
     ./redis
+    ./trakt-backup
     # ./uptime-kuma
     ./vaultwarden
     ./zigbee2mqtt

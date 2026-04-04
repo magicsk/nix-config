@@ -111,6 +111,7 @@ in
       flaresolverr.enable = true;
       go2rtc.enable = true;
       obico-ml.enable = true;
+      trakt-backup.enable = true;
     };
   };
 }
