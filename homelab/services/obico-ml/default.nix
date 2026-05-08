@@ -9,22 +9,6 @@ in
     enable = lib.mkEnableOption {
       description = "Enable ${service}";
     };
-    homepage.name = lib.mkOption {
-      type = lib.types.str;
-      default = "Obico ML";
-    };
-    homepage.description = lib.mkOption {
-      type = lib.types.str;
-      default = "3D print spaghetti detection";
-    };
-    homepage.icon = lib.mkOption {
-      type = lib.types.str;
-      default = "obico.svg";
-    };
-    homepage.category = lib.mkOption {
-      type = lib.types.str;
-      default = "Smart Home";
-    };
   };
 
   config = lib.mkIf cfg.enable {
