@@ -34,6 +34,10 @@ in
     };
   };
   config = lib.mkIf cfg.enable {
+    services.udev.extraRules = ''
+      KERNEL=="video[0-9]*", MODE="0666"
+    '';
+
     environment.persistence."/" = {
       directories = [
         { directory = cfg.configDir; user = homelab.user; group = homelab.group; mode = "0775"; }
@@ -58,8 +62,11 @@ in
               # "--privileged"
               "--cap-add=NET_ADMIN"
               "--cap-add=NET_RAW"
+              "--device-cgroup-rule=c 81:* rmw"
+              "--group-add=video"
             ];
             volumes = [
+              "/dev:/dev"
               "${cfg.configDir}:/config"
               "${homelab.mounts.Nitor}/Backups/hass:/config/backups"
               "${homelab.mounts.Alumentum}:/mnt/Alumentum"
