@@ -119,19 +119,22 @@ in
           homepageServices =
             x:
             (lib.attrsets.filterAttrs (
-              name: value: value ? homepage && value.homepage.category == x
+              name: value: value ? homepage && value.enable && value.homepage.category == x
             ) homelab.services);
         in
         lib.lists.forEach homepageCategories (cat: {
           "${cat}" =
             lib.lists.forEach (lib.attrsets.mapAttrsToList (name: value: name) (homepageServices "${cat}"))
               (x: {
-                "${hl.${x}.homepage.name}" = {
-                  icon = hl.${x}.homepage.icon;
-                  description = hl.${x}.homepage.description;
-                  href = "https://${hl.${x}.url}";
-                  siteMonitor = "https://${hl.${x}.url}";
-                };
+                "${hl.${x}.homepage.name}" =
+                  {
+                    icon = hl.${x}.homepage.icon;
+                    description = hl.${x}.homepage.description;
+                    href = "https://${hl.${x}.url}";
+                  }
+                  // lib.optionalAttrs (hl.${x}.homepage.siteMonitor or true) {
+                    siteMonitor = "https://${hl.${x}.url}";
+                  };
               });
         })
         ++ [ { Misc = cfg.misc; } ]
