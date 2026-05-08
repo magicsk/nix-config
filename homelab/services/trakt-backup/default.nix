@@ -144,24 +144,21 @@ let
 
       local page=1
       local all_data="[]"
+      local header_file
+      header_file=$(mktemp)
 
       while true; do
-        local response headers http_code body
-        response=$(${pkgs.curl}/bin/curl -s -w "\n%{http_code}" -D- \
+        local http_code body
+        body=$(${pkgs.curl}/bin/curl -s -w "%{http_code}" -D "$header_file" \
           "$API_BASE/$endpoint$(echo "$endpoint" | grep -q '?' && echo '&' || echo '?')extended=gdpr&page=$page&limit=1000" \
           -H "Authorization: Bearer $access_token" \
           -H "trakt-api-key: $CLIENT_ID" \
           -H "trakt-api-version: 2" \
           -H "Content-Type: application/json")
 
-        # Split headers and body - curl -D- writes headers then body
-        # With -w, the http_code is on the last line
-        http_code=$(echo "$response" | tail -1)
-        # Remove last line (http_code), split on empty line between headers and body
-        local full_response
-        full_response=$(echo "$response" | sed '$d')
-        headers=$(echo "$full_response" | sed '/^\r$/q')
-        body=$(echo "$full_response" | sed '1,/^\r$/d')
+        # http_code is appended to body by -w, extract it
+        http_code="''${body: -3}"
+        body="''${body:0:''${#body}-3}"
 
         if [ "$http_code" != "200" ]; then
           warn "Endpoint $endpoint page $page returned HTTP $http_code"
@@ -171,7 +168,7 @@ let
         all_data=$(echo "$all_data" "$body" | ${pkgs.jq}/bin/jq -s '.[0] + .[1]')
 
         local page_count
-        page_count=$(echo "$headers" | grep -i 'x-pagination-page-count' | tr -d '\r' | awk -F': ' '{print $2}')
+        page_count=$(grep -i '^x-pagination-page-count:' "$header_file" | tr -d '\r' | awk -F': ' '{print $2}')
 
         if [ -z "$page_count" ] || [ "$page" -ge "$page_count" ]; then
           break
@@ -180,6 +177,7 @@ let
         page=$((page + 1))
       done
 
+      rm -f "$header_file"
       echo "$all_data" | ${pkgs.jq}/bin/jq '.' > "$output_file"
       log "Fetched $endpoint -> $(echo "$all_data" | ${pkgs.jq}/bin/jq 'length') items"
     }
@@ -278,6 +276,9 @@ in
       "d ${cfg.backupDir} 0775 ${hl.user} ${hl.group} -"
     ];
 
+    age.secrets.traktClientId.owner = hl.user;
+    age.secrets.traktClientSecret.owner = hl.user;
+
     environment.persistence."/".directories = [
       {
         directory = cfg.dataDir;
@@ -291,6 +292,7 @@ in
       description = "Trakt account backup";
       after = [ "network-online.target" ];
       wants = [ "network-online.target" ];
+      path = with pkgs; [ coreutils gnugrep gnused gawk ];
       serviceConfig = {
         Type = "oneshot";
         User = hl.user;
