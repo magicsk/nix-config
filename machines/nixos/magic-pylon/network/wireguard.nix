@@ -58,13 +58,16 @@ in
       ];
       postUp = ''
         ${pkgs.iproute2}/bin/ip rule add uidrange 994-994 table main
+        ${pkgs.iproute2}/bin/ip route add 100.100.100.100/32 dev tailscale0 table main
       '';
       preDown = ''
+        ${pkgs.iproute2}/bin/ip route del 100.100.100.100/32 dev tailscale0 table main || true
         ${pkgs.iproute2}/bin/ip rule del uidrange 994-994 table main
       '';
   };
   systemd.services."wg-quick-wg0" = {
     requires = [ "generate-wireguard-keys.service" ];
-    after = [ "generate-wireguard-keys.service" ];
+    after = [ "generate-wireguard-keys.service" "tailscaled.service" ];
+    wants = [ "tailscaled.service" ];
   };
 }
