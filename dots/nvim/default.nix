@@ -1,6 +1,7 @@
 {
   inputs,
   config,
+  lib,
   pkgs,
   ...
 }:
@@ -36,6 +37,7 @@ in
 
   programs.nixvim = {
     enable = true;
+    nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [ "barbar.nvim" ];
     colorschemes.nord = {
       enable = true;
       settings = {
