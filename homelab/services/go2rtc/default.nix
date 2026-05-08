@@ -1,17 +1,17 @@
-{ config, lib, ... }:
+{ config, lib, pkgs, ... }:
 let
   service = "go2rtc";
   cfg = config.homelab.services.${service};
   homelab = config.homelab;
+  configFile = pkgs.writeText "go2rtc.yaml" ''
+    streams:
+      usb_cam: exec:ffmpeg -f v4l2 -input_format mjpeg -video_size 1920x1080 -framerate 30 -i /dev/v4l/by-id/usb-2M_UVC_CAMERA_NexiGo_N60_FHD_Webcam_2021030103-video-index0 -c:v libx264 -preset ultrafast -tune zerolatency -g 30 -f rtsp {output}
+  '';
 in
 {
   options.homelab.services.${service} = {
     enable = lib.mkEnableOption {
       description = "Enable ${service}";
-    };
-    dataDir = lib.mkOption {
-      type = lib.types.str;
-      default = "${homelab.mounts.config}/${service}";
     };
     url = lib.mkOption {
       type = lib.types.str;
@@ -27,7 +27,7 @@ in
     };
     homepage.icon = lib.mkOption {
       type = lib.types.str;
-      default = "go2rtc.svg";
+      default = "sh-go2rtc.svg";
     };
     homepage.category = lib.mkOption {
       type = lib.types.str;
@@ -41,7 +41,7 @@ in
       oci-containers.containers.${service} = {
         image = "alexxit/go2rtc";
         volumes = [
-          "${cfg.dataDir}:/config"
+          "${configFile}:/config/go2rtc.yaml:ro"
           "/dev:/dev"
         ];
         extraOptions = [
@@ -66,8 +66,5 @@ in
       '';
     };
 
-    environment.persistence."/".directories = [
-      { directory = cfg.dataDir; user = homelab.user; group = homelab.group; mode = "0755"; }
-    ];
   };
 }
