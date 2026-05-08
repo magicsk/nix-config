@@ -35,6 +35,11 @@ in
       type = lib.types.str;
       default = "Services";
     };
+    homepage.siteMonitor = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Whether homepage should probe ${service} for status.";
+    };
   };
   config = lib.mkIf cfg.enable {
     services.${service} = {
@@ -55,6 +60,9 @@ in
       DynamicUser = lib.mkForce false;
       User = "redlib";
       Group = "redlib";
+      Restart = "always";
+      RestartSec = "10min";
+      StartLimitIntervalSec = 0;
     };
 
     services.caddy.virtualHosts."${cfg.url}" = {
