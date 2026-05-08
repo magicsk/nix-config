@@ -79,6 +79,7 @@
     # ./audiobookshelf
     ./backup
     ./borg-ui
+    ./bugsink
     ./claude-wrapper
     ./code-server
     ./esphome
@@ -96,6 +97,7 @@
     ./open-webui
     ./otbr
     ./paperless-ngx
+    ./plausible
     ./postgresql
     ./qbittorrent
     ./redlib
