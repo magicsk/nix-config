@@ -49,6 +49,7 @@ in
         ENABLE_OLLAMA_API = "false";
         OPENAI_API_BASE_URLS = "http://127.0.0.1:8090/v1";
         OPENAI_API_KEYS = "";
+        AIOHTTP_CLIENT_TIMEOUT = "600";
       };
     };
 
