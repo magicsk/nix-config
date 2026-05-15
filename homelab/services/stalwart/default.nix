@@ -6,8 +6,10 @@ let
 
   adminHost  = "${service}.${homelab.baseDomain}";
 
-  dbName = service;
-  dbUser = service;
+  # Match OS user so peer-auth on /run/postgresql works; ensureDBOwnership
+  # additionally requires the pg user and database to share a name.
+  dbName = svcUser;
+  dbUser = svcUser;
 
   # nixpkgs 25.11 still ships the module as services.stalwart-mail with user/group stalwart-mail.
   svcUser  = "stalwart-mail";
