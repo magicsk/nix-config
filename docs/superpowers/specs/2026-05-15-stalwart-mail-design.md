@@ -19,7 +19,7 @@ In scope:
 - Admin UI on a Tailscale-only hostname; SMTP/IMAP on a public hostname
 - TLS certs reused from existing wildcard ACME (`security.acme.certs."magicsk.eu"`)
 - PostgreSQL backend for metadata (reuses existing `services.postgresql`), filesystem for blobs
-- Borg backups via the existing `services-to-nitor` job and `postgresqlBackup`
+- Relocate `services.postgresqlBackup.location` to `${hl.mounts.Nitor}/Backups/postgresql` so PG dumps survive reboots; borg coverage of that folder is managed externally via borg-ui
 
 Out of scope:
 
@@ -86,6 +86,8 @@ Out of scope:
 - `homelab/services/default.nix` — add `./stalwart` to imports
 - `machines/nixos/magic-pylon/homelab/default.nix` — enable `stalwart` with `resendApiKeyFile`
 - `machines/nixos/magic-pylon/secrets/default.nix` — add `resendApiKey` agenix entry
+- `homelab/services/postgresql/default.nix` — enable `services.postgresqlBackup` (currently gated behind the disabled `homelab.services.backup` module) with `location` on Nitor
+- `homelab/services/backup/default.nix` — remove the now-redundant `services.postgresqlBackup` block
 
 ### External
 
@@ -397,22 +399,48 @@ Send a test to:
 
 ## Backup integration
 
-No new backup config required. Existing setup covers everything:
+This repo's `homelab.services.backup` nix module is intentionally disabled — backup jobs are managed via **borg-ui** out-of-band. So no automatic borg coverage is added by this change. What this change *does* do is make sure stalwart's persistent data lives where borg-ui can pick it up:
 
-- Mail blobs at `/persist/opt/services/stalwart/` → `services-to-nitor` borg job (daily, 7d + 4w retention).
-- Live PG data at `/persist/opt/services/postgresql/<schema>/` → same borg job.
-- PG logical dumps → `services.postgresqlBackup` already configured with `databases = ensureDatabases`; adding `stalwart` to `ensureDatabases` automatically pulls it in.
-- DKIM private key → stored in PG `stalwart` database → backed up with the rest.
+- **Mail blobs** at `/persist/opt/services/stalwart/blobs/` — already on a persistent path; include this folder in your borg-ui job set.
+- **Live PG data** at `/persist/opt/services/postgresql/<schema>/` — already in your borg-ui scope (presumably, alongside other services).
+- **PG logical dumps** → relocated from default `/var/backup/postgresql/` to `${hl.mounts.Nitor}/Backups/postgresql` (see snippet below). This is the only nix-side change required for backup; borg-ui can mirror that folder to Alumentum on whatever cadence you've configured there.
+- **DKIM private key** → stored in PG `stalwart` database → captured by both the live PG dir and the logical dumps.
 
-**Restore drill:**
-1. Restore `/persist/opt/services/stalwart/` from borg.
-2. Restore PG `stalwart` database from latest `postgresqlBackup` dump.
+### Enable PG dumps independently of the disabled backup module
+
+Today `services.postgresqlBackup` is configured inside `homelab/services/backup/default.nix` under `lib.mkIf cfg.enable`, so it's *not* running. Move it into the postgres module (`homelab/services/postgresql/default.nix`) so it runs whenever postgres is enabled:
+
+```nix
+# in homelab/services/postgresql/default.nix, inside `config = lib.mkIf …`
+services.postgresqlBackup = {
+  enable    = true;
+  databases = config.services.postgresql.ensureDatabases;
+  location  = "${homelab.mounts.Nitor}/Backups/postgresql";
+};
+
+systemd.tmpfiles.rules = [
+  # …existing tmpfiles rules…
+  "d ${homelab.mounts.Nitor}/Backups/postgresql 0700 postgres postgres -"
+];
+
+environment.persistence."/".directories = [
+  # …existing…
+  { directory = "${homelab.mounts.Nitor}/Backups/postgresql"; user = "postgres"; group = "postgres"; mode = "0700"; }
+];
+```
+
+Also remove the now-redundant `services.postgresqlBackup` block from `homelab/services/backup/default.nix` so the configuration has a single source of truth.
+
+> Note: This will now also produce nightly logical dumps for nextcloud, plausible, paperless, bugsink, and any other postgres-backed service — not just stalwart. That's a positive side effect (you previously had no logical dumps for any of them), but mentioning so you can opt out of any specific database via `databases = lib.filter (d: d != "foo") config.services.postgresql.ensureDatabases` if needed.
+
+> **Operator note:** Nitor is 2× HDD RAID0 (no redundancy). Make sure your borg-ui setup mirrors `${hl.mounts.Nitor}/Backups/postgresql` to Alumentum so dumps survive a single Nitor drive failure.
+
+### Restore drill
+
+1. Restore `/persist/opt/services/stalwart/` from your borg-ui repository.
+2. Restore PG `stalwart` database from the latest `postgresqlBackup` dump (`gunzip -c /mnt/Nitor/Backups/postgresql/stalwart.sql.gz | psql stalwart`).
 3. `systemctl restart stalwart-mail`.
 4. Verify admin UI loads and a test mail arrives.
-
-### Pre-existing concern (out of scope)
-
-`services.postgresqlBackup` dumps to default `/var/backup/postgresql/`, which is *not* under `/persist` and *not* in the borg job. Crash recovery still works (live PG dir is backed up), but point-in-time logical dumps don't survive a reboot. Easy follow-up: set `services.postgresqlBackup.location = "${hl.mounts.config}/postgresql-backup"`. Not in scope for this change.
 
 ## Bootstrap / first-run flow
 
@@ -461,5 +489,4 @@ Manual, post-implementation:
 - Sieve scripts for advanced filtering
 - Push notifications via JMAP
 - Migration of existing mail from other providers (manual `imapsync` if needed, separate task)
-- `services.postgresqlBackup.location` pointing into `/persist` (separate task)
 - Flipping `firewall.enable = true` on magic-pylon (separate task, needs full-service audit)
