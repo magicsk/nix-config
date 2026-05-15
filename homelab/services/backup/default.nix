@@ -52,10 +52,6 @@ in
     ];
 
     # Keep the built-in DB backup services alive if they are in use
-    services.postgresqlBackup = {
-      enable = config.services.postgresql.enable;
-      databases = config.services.postgresql.ensureDatabases;
-    };
     services.mysqlBackup = {
       enable = config.services.mysql.enable;
       databases = config.services.mysql.ensureDatabases;
