@@ -34,11 +34,12 @@ in
       description = "Path to a file containing the Resend SMTP API key.";
     };
 
-    adminSecretFile = lib.mkOption {
+    adminPasswordFile = lib.mkOption {
       type = lib.types.path;
       description = ''
-        Path to a file containing the SHA-512 crypt hash (starts with `$6$`)
-        of the fallback admin password. Generate with `openssl passwd -6`.
+        Path to a file containing the plaintext fallback admin password.
+        The service hashes it (sha-512 crypt) at start time and feeds the
+        hash to Stalwart's authentication.fallback-admin.secret.
       '';
     };
 
@@ -64,8 +65,8 @@ in
       # systemd LoadCredential reads the agenix-decrypted file as root and exposes it
       # as a per-unit credential at /run/credentials/stalwart-mail.service/resendApiKey.
       credentials = {
-        resendApiKey = toString cfg.resendApiKeyFile;
-        adminSecret  = toString cfg.adminSecretFile;
+        resendApiKey  = toString cfg.resendApiKeyFile;
+        adminPassword = toString cfg.adminPasswordFile;
       };
 
       settings = {
@@ -120,9 +121,12 @@ in
 
         # Bootstrap admin: only honored if no equivalent account exists in the directory.
         # Rotate after first login via the admin UI (My Account → Change Password).
+        # The plaintext password lives in agenix; ExecStartPre hashes it into
+        # /run/stalwart-mail/admin-secret on every start (random salt, but
+        # crypt-compatible — different bytes each run, same password validates).
         authentication.fallback-admin = {
           user = "admin";
-          secret = "%{file:/run/credentials/stalwart-mail.service/adminSecret}%";
+          secret = "%{file:/run/stalwart-mail/admin-secret}%";
         };
 
       };
@@ -157,9 +161,28 @@ in
     systemd.services.stalwart-mail = {
       after    = [ "postgresql.service" ];
       requires = [ "postgresql.service" ];
-      # Upstream module restricts to AF_INET/AF_INET6; we connect to postgres
-      # over a Unix-domain socket at /run/postgresql, so AF_UNIX must be added.
-      serviceConfig.RestrictAddressFamilies = lib.mkForce [ "AF_INET" "AF_INET6" "AF_UNIX" ];
+      serviceConfig = {
+        # Upstream module restricts to AF_INET/AF_INET6; postgres lives on a
+        # Unix-domain socket at /run/postgresql, so AF_UNIX must be added.
+        RestrictAddressFamilies = lib.mkForce [ "AF_INET" "AF_INET6" "AF_UNIX" ];
+
+        # Writable tmpfs at /run/stalwart-mail/, used for the hashed admin secret.
+        RuntimeDirectory = "stalwart-mail";
+        RuntimeDirectoryMode = "0750";
+
+        # Pre-start: read plaintext admin password from systemd credential store,
+        # produce a sha-512 crypt hash (no trailing newline), and drop it where
+        # Stalwart's %{file:…}% expansion can read it.
+        ExecStartPre = [
+          (pkgs.writeShellScript "stalwart-hash-admin" ''
+            set -eu
+            ${pkgs.mkpasswd}/bin/mkpasswd -m sha-512 -s \
+              < "$CREDENTIALS_DIRECTORY/adminPassword" \
+              | ${pkgs.coreutils}/bin/tr -d '\n' \
+              > /run/stalwart-mail/admin-secret
+          '')
+        ];
+      };
     };
   };
 }

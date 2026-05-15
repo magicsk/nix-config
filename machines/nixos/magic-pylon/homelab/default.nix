@@ -131,7 +131,7 @@ in
       stalwart = {
         enable = true;
         resendApiKeyFile = config.age.secrets.resendApiKey.path;
-        adminSecretFile = config.age.secrets.stalwartAdminSecret.path;
+        adminPasswordFile = config.age.secrets.stalwartAdminPassword.path;
       };
     };
   };
