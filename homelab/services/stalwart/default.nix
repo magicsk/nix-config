@@ -79,6 +79,8 @@ in
         store."blob-fs" = { type = "fs";         path = "${cfg.dataDir}/blobs"; };
         storage = {
           data = "pg"; blob = "blob-fs"; fts = "pg"; lookup = "pg"; directory = "internal";
+          # v0.14+ requires storage.in-memory for security/anti-spam state; nixpkgs default omits it.
+          in-memory = "pg";
         };
 
         directory."internal" = { type = "internal"; store = "pg"; };
