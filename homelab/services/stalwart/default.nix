@@ -140,6 +140,9 @@ in
     systemd.services.stalwart-mail = {
       after    = [ "postgresql.service" ];
       requires = [ "postgresql.service" ];
+      # Upstream module restricts to AF_INET/AF_INET6; we connect to postgres
+      # over a Unix-domain socket at /run/postgresql, so AF_UNIX must be added.
+      serviceConfig.RestrictAddressFamilies = lib.mkForce [ "AF_INET" "AF_INET6" "AF_UNIX" ];
     };
   };
 }
