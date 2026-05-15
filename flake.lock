@@ -168,11 +168,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1777851538,
-        "narHash": "sha256-Gp8qwTEYNoy2yvmErVGlvLOQvrtEECCAKbonW7VJef8=",
+        "lastModified": 1778401693,
+        "narHash": "sha256-OVHdCqXXUF5UdGkH+FF2ZL06OLZjj2kvP2dIUmzVWoo=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "cc09c0f9b7eaa95c2d9827338a5eb03d32505ca5",
+        "rev": "389b83002efc26f1145e89a6a8e6edc5a6435948",
         "type": "github"
       },
       "original": {
@@ -229,11 +229,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1777787189,
-        "narHash": "sha256-2KUbS/HhzWW3kkkY1+RiWj9mJ76VEXw8lBJzcCFKzfY=",
+        "lastModified": 1778393439,
+        "narHash": "sha256-mOtQxUjtKaPHLeoLOY/YEDctmud1X9KwJr4kE1MJ3Wc=",
         "owner": "Mic92",
         "repo": "nix-index-database",
-        "rev": "2dea2b920e7127b3afa8506713f23536651de312",
+        "rev": "01466c414c7357ae2ce32be4a272a7c69e94ab5f",
         "type": "github"
       },
       "original": {
@@ -347,11 +347,11 @@
     "secrets": {
       "flake": false,
       "locked": {
-        "lastModified": 1775321171,
-        "narHash": "sha256-A9X1xyqaT0C+uVQB0zcWhCNTgnM57XP5XlNzwtqO3l4=",
+        "lastModified": 1778504851,
+        "narHash": "sha256-bTYgmYRbLo/QKLchvpOS23GLEJxUKni0NlFBgdGSJ6o=",
         "ref": "main",
-        "rev": "893a5fe64e96218c30a2b9ccef664b28caf2d8f3",
-        "revCount": 9,
+        "rev": "559d28668131ceb57a7d863663360af44c2a1f1f",
+        "revCount": 11,
         "type": "git",
         "url": "ssh://git@github.com/magicsk/nix-private.git"
       },
