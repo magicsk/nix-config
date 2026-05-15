@@ -4,7 +4,6 @@ let
   cfg = config.homelab.services.${service};
   homelab = config.homelab;
 
-  publicHost = "mail.${homelab.baseDomain}";
   adminHost  = "${service}.${homelab.baseDomain}";
 
   dbName = service;
@@ -52,8 +51,8 @@ in
       package = pkgs.stalwart-mail;
       openFirewall = false;
 
-      # Pass the Resend API key via systemd LoadCredential so the stalwart-mail
-      # process can read it at /run/credentials/stalwart-mail.service/resendApiKey.
+      # systemd LoadCredential reads the agenix-decrypted file as root and exposes it
+      # as a per-unit credential at /run/credentials/stalwart-mail.service/resendApiKey.
       credentials = {
         resendApiKey = toString cfg.resendApiKeyFile;
       };
@@ -131,12 +130,6 @@ in
       "stalwart-mail.service"
     ];
     users.users.${svcUser}.extraGroups = [ config.services.caddy.group ];
-
-    # agenix decrypts to /run/agenix/<name> as root:root 0400 by default.
-    # The stalwart-mail NixOS module uses systemd LoadCredential to forward the file
-    # into the service's credential store, so root-readable is sufficient.
-    # We also set owner here for belt-and-suspenders safety.
-    age.secrets.resendApiKey.owner = svcUser;
 
     environment.persistence."/".directories = [
       { directory = cfg.dataDir; user = svcUser; group = svcGroup; mode = "0750"; }
