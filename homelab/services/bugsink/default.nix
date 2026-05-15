@@ -13,13 +13,23 @@ in
       type = lib.types.str;
       default = "${homelab.mounts.config}/${service}";
     };
+    uid = lib.mkOption {
+      type = lib.types.int;
+      default = 14237;
+      description = "Host UID matching the bugsink user inside the container image.";
+    };
+    gid = lib.mkOption {
+      type = lib.types.int;
+      default = 14237;
+      description = "Host GID matching the bugsink group inside the container image.";
+    };
     url = lib.mkOption {
       type = lib.types.str;
       default = "${service}.${homelab.baseDomain}";
     };
     port = lib.mkOption {
       type = lib.types.port;
-      default = 8020;
+      default = 8025;
     };
     environmentFile = lib.mkOption {
       type = lib.types.path;
@@ -44,6 +54,13 @@ in
   };
 
   config = lib.mkIf cfg.enable {
+    users.groups.${service}.gid = cfg.gid;
+    users.users.${service} = {
+      uid = cfg.uid;
+      group = service;
+      isSystemUser = true;
+    };
+
     virtualisation = {
       podman.enable = true;
       oci-containers.containers.${service} = {
@@ -57,6 +74,8 @@ in
           TZ = homelab.timeZone;
           BASE_URL = "https://${cfg.url}";
           BEHIND_HTTPS_PROXY = "true";
+          DATABASE_PATH = "/data/db.sqlite3";
+          PHONEHOME = "false";
           PORT = "8000";
         };
         environmentFiles = [
@@ -75,12 +94,16 @@ in
       '';
     };
 
+    systemd.tmpfiles.rules = [
+      "d ${cfg.dataDir} 0750 ${service} ${service} - -"
+    ];
+
     environment.persistence."/".directories = [
       {
         directory = cfg.dataDir;
-        user = homelab.user;
-        group = homelab.group;
-        mode = "0755";
+        user = service;
+        group = service;
+        mode = "0750";
       }
     ];
   };

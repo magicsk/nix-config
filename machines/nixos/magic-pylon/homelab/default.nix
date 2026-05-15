@@ -40,6 +40,12 @@ in
     };
     services = {
       enable = true;
+      reservedPorts = [
+        {
+          name = "external-8020";
+          port = 8020;
+        }
+      ];
       immich.enable = true;
       borg-ui.enable = true;
       homepage = {
@@ -90,6 +96,16 @@ in
       vaultwarden.enable = true;
       qbittorrent.enable = true;
       redlib.enable = true;
+      plausible = {
+        enable = true;
+        url = "pl.${config.homelab.baseDomain}";
+        secretKeybaseFile = config.age.secrets.plausibleSecretKeybase.path;
+      };
+      bugsink = {
+        enable = true;
+        url = "bs.${config.homelab.baseDomain}";
+        environmentFile = config.age.secrets.bugsinkEnv.path;
+      };
       code-server = {
         enable = true;
         passFile = config.age.secrets.codeServerPassword.path;

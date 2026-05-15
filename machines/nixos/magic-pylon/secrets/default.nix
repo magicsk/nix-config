@@ -9,5 +9,7 @@
     tailscaleAuthKey.file = "${inputs.secrets}/tailscaleAuthKey.age";
     traktClientId.file = "${inputs.secrets}/traktClientId.age";
     traktClientSecret.file = "${inputs.secrets}/traktClientSecret.age";
+    plausibleSecretKeybase.file = "${inputs.secrets}/plausibleSecretKeybase.age";
+    bugsinkEnv.file = "${inputs.secrets}/bugsinkEnv.age";
   };
 }
