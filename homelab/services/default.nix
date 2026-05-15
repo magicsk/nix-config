@@ -174,6 +174,7 @@ in
     ./qbittorrent
     ./redlib
     ./redis
+    ./stalwart
     ./trakt-backup
     # ./uptime-kuma
     ./vaultwarden

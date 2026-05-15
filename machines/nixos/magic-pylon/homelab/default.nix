@@ -128,6 +128,10 @@ in
       go2rtc.enable = true;
       obico-ml.enable = true;
       trakt-backup.enable = true;
+      stalwart = {
+        enable = true;
+        resendApiKeyFile = config.age.secrets.resendApiKey.path;
+      };
     };
   };
 }
