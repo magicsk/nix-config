@@ -4,12 +4,84 @@
   pkgs,
   ...
 }:
+let
+  hl = config.homelab.services;
+  portClaim = name: port: enabled: { inherit name port enabled; };
+  reservedPortClaims =
+    map (claim: {
+      inherit (claim) name port;
+      enabled = true;
+    }) hl.reservedPorts;
+  enabledPortClaims =
+    reservedPortClaims
+    ++
+    lib.filter (claim: claim.enabled) [
+      (portClaim "affine" 3010 hl.affine.enable)
+      (portClaim "borg-ui" 8084 hl."borg-ui".enable)
+      (portClaim "bugsink" hl.bugsink.port hl.bugsink.enable)
+      (portClaim "claude-wrapper" 8090 hl."claude-wrapper".enable)
+      (portClaim "code-server" 8443 hl."code-server".enable)
+      (portClaim "esphome" config.services.esphome.port hl.esphome.enable)
+      (portClaim "flaresolverr" 8191 hl.flaresolverr.enable)
+      (portClaim "go2rtc-http" 1984 hl.go2rtc.enable)
+      (portClaim "go2rtc-webrtc" 8555 hl.go2rtc.enable)
+      (portClaim "homeassistant" 8123 hl.homeassistant.enable)
+      (portClaim "homepage" config.services."homepage-dashboard".listenPort hl.homepage.enable)
+      (portClaim "immich" config.services.immich.port hl.immich.enable)
+      (portClaim "jellyfin" 8096 hl.jellyfin.enable)
+      (portClaim "jellyseerr" hl.jellyseerr.port hl.jellyseerr.enable)
+      (portClaim "matter-server" 5580 hl."matter-server".enable)
+      (portClaim "minecraft" 25565 hl.minecraft.enable)
+      (portClaim "minecraft-rcon" 25575 hl.minecraft.enable)
+      (portClaim "mosquitto" 1883 hl.mosquitto.enable)
+      (portClaim "obico-ml" 3333 hl."obico-ml".enable)
+      (portClaim "open-webui" config.services."open-webui".port hl."open-webui".enable)
+      (portClaim "paperless" 8000 hl.paperless.enable)
+      (portClaim "plausible" hl.plausible.port hl.plausible.enable)
+      (portClaim "plausible-clickhouse" hl.plausible.clickhouseHttpPort hl.plausible.enable)
+      (portClaim "prowlarr" 9696 hl.prowlarr.enable)
+      (portClaim "qbittorrent" 8112 hl.qbittorrent.enable)
+      (portClaim "radarr" 7878 hl.radarr.enable)
+      (portClaim "redlib" config.services.redlib.port hl.redlib.enable)
+      (portClaim "sonarr" 8989 hl.sonarr.enable)
+      (portClaim "vaultwarden" 8222 hl.vaultwarden.enable)
+      (portClaim "zigbee2mqtt" 8181 hl.zigbee2mqtt.enable)
+    ];
+  claimedPorts = lib.unique (map (claim: claim.port) enabledPortClaims);
+  claimsForPort = port: lib.filter (claim: claim.port == port) enabledPortClaims;
+  duplicatePorts = lib.filter (port: lib.length (claimsForPort port) > 1) claimedPorts;
+  formatDuplicate =
+    port:
+    "${toString port} (${lib.concatStringsSep ", " (map (claim: claim.name) (claimsForPort port))})";
+in
 {
   options.homelab.services = {
     enable = lib.mkEnableOption "Settings and services for the homelab";
+    reservedPorts = lib.mkOption {
+      default = [ ];
+      type = lib.types.listOf (
+        lib.types.submodule {
+          options = {
+            name = lib.mkOption {
+              type = lib.types.str;
+            };
+            port = lib.mkOption {
+              type = lib.types.port;
+            };
+          };
+        }
+      );
+      description = "Host TCP ports that are reserved by services outside this homelab module.";
+    };
   };
 
   config = lib.mkIf config.homelab.services.enable {
+    assertions = [
+      {
+        assertion = duplicatePorts == [ ];
+        message = "Homelab service port collision(s): ${lib.concatStringsSep "; " (map formatDuplicate duplicatePorts)}";
+      }
+    ];
     networking.firewall.allowedTCPPorts = [
       80
       443
