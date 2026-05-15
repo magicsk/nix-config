@@ -91,7 +91,15 @@ in
           data = "pg"; blob = "blob-fs"; fts = "pg"; lookup = "pg"; directory = "internal";
         };
 
-        directory."internal" = { type = "internal"; store = "pg"; };
+        directory."internal" = {
+          type = "internal";
+          store = "pg";
+          # Enable catch-all + sub-addressing (foo+bar@) at the directory level.
+          # Per-domain catch-all is then configured by adding an "@<domain>"
+          # alias to whichever account should receive unmatched mail.
+          options.catch-all = true;
+          options.subaddressing = true;
+        };
 
         # v0.13+ outbound routing: use queue.strategy.route instead of the deprecated next-hop.
         queue.strategy.route = [
