@@ -11,5 +11,6 @@
     traktClientSecret.file = "${inputs.secrets}/traktClientSecret.age";
     plausibleSecretKeybase.file = "${inputs.secrets}/plausibleSecretKeybase.age";
     bugsinkEnv.file = "${inputs.secrets}/bugsinkEnv.age";
+    resendApiKey.file = "${inputs.secrets}/resendApiKey.age";
   };
 }

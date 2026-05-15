@@ -347,11 +347,11 @@
     "secrets": {
       "flake": false,
       "locked": {
-        "lastModified": 1778504851,
-        "narHash": "sha256-bTYgmYRbLo/QKLchvpOS23GLEJxUKni0NlFBgdGSJ6o=",
+        "lastModified": 1778846008,
+        "narHash": "sha256-nf43Ha+lZQB4kx4b25grUPFnXP6ZBgY/iCjsWGX7m4I=",
         "ref": "main",
-        "rev": "559d28668131ceb57a7d863663360af44c2a1f1f",
-        "revCount": 11,
+        "rev": "7aa774d3b31853024be21bde231306e9237eecab",
+        "revCount": 12,
         "type": "git",
         "url": "ssh://git@github.com/magicsk/nix-private.git"
       },
