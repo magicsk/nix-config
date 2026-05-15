@@ -34,6 +34,14 @@ in
       description = "Path to a file containing the Resend SMTP API key.";
     };
 
+    adminSecretFile = lib.mkOption {
+      type = lib.types.path;
+      description = ''
+        Path to a file containing the SHA-512 crypt hash (starts with `$6$`)
+        of the fallback admin password. Generate with `openssl passwd -6`.
+      '';
+    };
+
     primaryDomain = lib.mkOption {
       type = lib.types.str;
       default = homelab.baseDomain;
@@ -57,6 +65,7 @@ in
       # as a per-unit credential at /run/credentials/stalwart-mail.service/resendApiKey.
       credentials = {
         resendApiKey = toString cfg.resendApiKeyFile;
+        adminSecret  = toString cfg.adminSecretFile;
       };
 
       settings = {
@@ -107,6 +116,13 @@ in
             { "if" = "listener == 'submission' || listener == 'submissions'"; "then" = true; }
             { "else" = false; }
           ];
+        };
+
+        # Bootstrap admin: only honored if no equivalent account exists in the directory.
+        # Rotate after first login via the admin UI (My Account → Change Password).
+        authentication.fallback-admin = {
+          user = "admin";
+          secret = "%{file:/run/credentials/stalwart-mail.service/adminSecret}%";
         };
 
       };

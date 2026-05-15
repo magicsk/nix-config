@@ -12,5 +12,6 @@
     plausibleSecretKeybase.file = "${inputs.secrets}/plausibleSecretKeybase.age";
     bugsinkEnv.file = "${inputs.secrets}/bugsinkEnv.age";
     resendApiKey.file = "${inputs.secrets}/resendApiKey.age";
+    stalwartAdminSecret.file = "${inputs.secrets}/stalwartAdminSecret.age";
   };
 }
