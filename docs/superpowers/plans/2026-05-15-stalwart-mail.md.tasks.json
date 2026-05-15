@@ -4,19 +4,19 @@
     {
       "id": 0,
       "subject": "Task 0: Relocate postgresqlBackup to postgres module",
-      "status": "pending",
+      "status": "completed",
       "description": "**Goal:** Make `postgresqlBackup` actually run by moving it out of the disabled `homelab.services.backup` module into the postgres module, with dumps on Nitor.\n\n**Files:**\n- Modify: `homelab/services/postgresql/default.nix`\n- Modify: `homelab/services/backup/default.nix`\n\n**Verify:** `just check && just dry-run magic-pylon`; after deploy `ls /mnt/Nitor/Backups/postgresql/` shows dump files.\n\n```json:metadata\n{\"files\": [\"homelab/services/postgresql/default.nix\", \"homelab/services/backup/default.nix\"], \"verifyCommand\": \"just check && just dry-run magic-pylon\", \"acceptanceCriteria\": [\"postgresqlBackup timers active\", \"dump produced in /mnt/Nitor/Backups/postgresql\", \"single source of truth in postgres module\"]}\n```"
     },
     {
       "id": 1,
       "subject": "Task 1: Add resendApiKey agenix secret entry",
-      "status": "pending",
+      "status": "completed",
       "description": "**Goal:** Reference the encrypted Resend SMTP API key (already in nix-private repo) so Stalwart can read it at runtime.\n\n**Files:**\n- Modify: `machines/nixos/magic-pylon/secrets/default.nix`\n\n**Verify:** `sudo ls -l /run/agenix/resendApiKey` on magic-pylon after deploy\n\n```json:metadata\n{\"files\": [\"machines/nixos/magic-pylon/secrets/default.nix\", \"flake.lock\"], \"verifyCommand\": \"just check\", \"acceptanceCriteria\": [\"agenix entry added\", \"flake.lock bumped to latest nix-private main\", \"decrypted key starts with re_\"]}\n```"
     },
     {
       "id": 2,
       "subject": "Task 2: Add Stalwart NixOS service module",
-      "status": "pending",
+      "status": "completed",
       "blockedBy": [1],
       "description": "**Goal:** Create the `homelab.services.stalwart` module, import it, and enable it on magic-pylon.\n\n**Files:**\n- Create: `homelab/services/stalwart/default.nix`\n- Modify: `homelab/services/default.nix`\n- Modify: `machines/nixos/magic-pylon/homelab/default.nix`\n\n**Verify:** `just check && just dry-run magic-pylon`\n\n```json:metadata\n{\"files\": [\"homelab/services/stalwart/default.nix\", \"homelab/services/default.nix\", \"machines/nixos/magic-pylon/homelab/default.nix\"], \"verifyCommand\": \"just check && just dry-run magic-pylon\", \"acceptanceCriteria\": [\"flake evaluates\", \"dry-run shows expected activations\", \"no settings schema errors\"]}\n```"
     },
@@ -62,5 +62,5 @@
       "description": "**Goal:** Prove the full system works — real send/receive, deliverability score, IMAP client configured.\n\n**Files:** none\n\n**Verify:** Gmail outbound passes auth, inbound arrives via IMAP, mail-tester ≥8/10, post-restart still works\n\n```json:metadata\n{\"files\": [], \"verifyCommand\": \"\", \"acceptanceCriteria\": [\"Gmail outbound passes auth\", \"inbound arrival via IMAP\", \"mail-tester >=8/10\", \"post-restart still works\"]}\n```"
     }
   ],
-  "lastUpdated": "2026-05-15T00:00:00Z"
+  "lastUpdated": "2026-05-15T18:50:00Z"
 }

@@ -12,6 +12,16 @@
 
 ---
 
+## Implementation notes (post-execution)
+
+The Task 2 module landed in commits `44347ea` and `cf73d7e` with schema adaptations for the actual nixpkgs 25.11 / Stalwart 0.14.1 in use:
+
+- `queue.outbound.next-hop` → `queue.strategy.route` (the old key triggers a hard nixpkgs assertion)
+- `else = false` → `else = "'local'"` for the outbound route fallback (v0.13+ expects a strategy name)
+- Secret passed via `services.stalwart-mail.credentials` (systemd LoadCredential) instead of direct `%{file:${cfg.resendApiKeyFile}}%` reads, because `ProtectSystem=strict` in the stalwart unit blocks reads from `/run/agenix/`.
+
+See `homelab/services/stalwart/default.nix` for the authoritative module code.
+
 ## Preconditions
 
 Before starting:
@@ -344,6 +354,12 @@ in
       "stalwart-mail.service"
     ];
     users.users.stalwart-mail.extraGroups = [ config.services.caddy.group ];
+
+    # NOTE: As actually implemented in commit `44347ea`, the Resend secret is passed
+    # via `services.stalwart-mail.credentials.resendApiKey = toString cfg.resendApiKeyFile`
+    # and the settings reference `%{file:/run/credentials/stalwart-mail.service/resendApiKey}%`
+    # instead of the agenix path. systemd LoadCredential reads the agenix file as root
+    # and exposes it as a per-unit credential — no `age.secrets.resendApiKey.owner` needed.
 
     environment.persistence."/".directories = [
       { directory = cfg.dataDir; user = "stalwart-mail"; group = "stalwart-mail"; mode = "0750"; }
