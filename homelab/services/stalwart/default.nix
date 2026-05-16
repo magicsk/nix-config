@@ -121,7 +121,9 @@ in
         };
 
         session.auth = {
-          mechanisms = [ "PLAIN" "LOGIN" ];
+          # Stalwart parses session.auth.mechanisms as an IfBlock whose value is
+          # an expression-string set, NOT a TOML array. Pass the literal expression.
+          mechanisms = "[plain, login]";
           directory = "'internal'";
           require = [
             { "if" = "listener == 'submission' || listener == 'submissions'"; "then" = true; }
