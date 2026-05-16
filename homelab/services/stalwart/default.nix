@@ -135,6 +135,14 @@ in
           reject-non-fqdn = false;
         };
 
+        # All inbound v4 mail comes through the VPS WireGuard tunnel and is
+        # source-IP-masqueraded to 172.16.16.1 on this side; without this
+        # allowlist, Stalwart's auto-ban quickly flags 172.16.16.1 after any
+        # noisy peer (bad EHLO, spam pattern) and then rejects every legitimate
+        # v4 sender with a TCP RST. Allowlisted IPs bypass rate limits and
+        # auto-banning entirely.
+        server.allowed-ip = [ "172.16.16.1" ];
+
         # Bootstrap admin: only honored if no equivalent account exists in the directory.
         # Rotate after first login via the admin UI (My Account → Change Password).
         # The plaintext password lives in agenix; ExecStartPre hashes it into
