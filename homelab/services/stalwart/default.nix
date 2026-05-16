@@ -101,12 +101,14 @@ in
           options.subaddressing = true;
         };
 
-        # v0.13+ outbound routing: use queue.strategy.route instead of the deprecated next-hop.
+        # v0.13+ outbound routing: queue.strategy.route picks a routing strategy
+        # by name; the actual relay/MX/local strategy lives under queue.route.<id>.
         queue.strategy.route = [
-          { "if" = "rcpt_domain != '${cfg.primaryDomain}'"; "then" = "'resend'"; }
-          { "else" = "'local'"; }
+          { "if" = "rcpt_domain == '${cfg.primaryDomain}'"; "then" = "'local'"; }
+          { "else" = "'resend'"; }
         ];
-        remote."resend" = {
+        queue.route."resend" = {
+          type = "relay";
           address = "smtp.resend.com";
           port = 465;
           protocol = "smtp";
