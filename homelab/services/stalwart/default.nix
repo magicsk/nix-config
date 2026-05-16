@@ -178,10 +178,21 @@ in
     security.acme.certs."${homelab.baseDomain}".reloadServices = [
       "stalwart-mail.service"
     ];
-    users.users.${svcUser}.extraGroups = [ config.services.caddy.group ];
+    # Add stalwart-mail to the homelab user's group so it can write into the
+    # persistence dir owned by ${homelab.user}; this keeps mail files
+    # accessible via SMB and to borg-ui backups running as ${homelab.user}.
+    users.users.${svcUser}.extraGroups = [
+      config.services.caddy.group
+      homelab.group
+    ];
 
+    # Data dir owned by the homelab user (so SMB and borg-ui can read all
+    # mail files). Setgid (2770) ensures every file/dir stalwart-mail creates
+    # inherits ${homelab.group} as its group, which combined with the relaxed
+    # UMask=0007 in the service config gives ${homelab.user} full rw access
+    # to all mail data via group membership.
     environment.persistence."/".directories = [
-      { directory = cfg.dataDir; user = svcUser; group = svcGroup; mode = "0750"; }
+      { directory = cfg.dataDir; user = homelab.user; group = homelab.group; mode = "2770"; }
     ];
 
     systemd.services.stalwart-mail = {
@@ -191,6 +202,17 @@ in
         # Upstream module restricts to AF_INET/AF_INET6; postgres lives on a
         # Unix-domain socket at /run/postgresql, so AF_UNIX must be added.
         RestrictAddressFamilies = lib.mkForce [ "AF_INET" "AF_INET6" "AF_UNIX" ];
+
+        # Upstream ReadWritePaths is /var/lib/stalwart-mail only; our blob
+        # store at /persist/opt/services/stalwart needs to be writable too,
+        # otherwise every inbound message fails the blob spool with "Read-only
+        # file system" (os error 30).
+        ReadWritePaths = [ cfg.dataDir ];
+
+        # Upstream UMask=0077 makes new files 0600 — unreadable for
+        # ${homelab.user} via group. Loosen to 0007 so files are 0660 / dirs
+        # 0770: full rw for owner (stalwart-mail) AND group (${homelab.group}).
+        UMask = lib.mkForce "0007";
 
         # Writable tmpfs at /run/stalwart-mail/, used for the hashed admin secret.
         RuntimeDirectory = "stalwart-mail";
