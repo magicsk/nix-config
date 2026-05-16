@@ -70,6 +70,36 @@ in
       };
 
       settings = {
+        # Tell Stalwart that these prefixes belong in the local TOML, not the
+        # runtime database. Without this, every restart logs ~20 "Database key
+        # defined in local configuration" warnings for our declarative config.
+        # Defining ANY config.local-keys.* replaces the upstream defaults, so
+        # we re-include them all alongside ours.
+        config.local-keys = {
+          # upstream defaults
+          server                = "server.*";
+          certificate           = "certificate.*";
+          local-keys            = "config.local-keys.*";
+          fallback-admin        = "authentication.fallback-admin.*";
+          cluster               = "cluster.*";
+          storage-data          = "storage.data";
+          storage-blob          = "storage.blob";
+          storage-lookup        = "storage.lookup";
+          storage-fts           = "storage.fts";
+          storage-directory     = "storage.directory";
+          # our additions for this declarative deployment
+          store                 = "store.*";
+          storage-extra         = "storage.*";
+          directory             = "directory.*";
+          session               = "session.*";
+          queue                 = "queue.*";
+          tracer                = "tracer.*";
+          webadmin              = "webadmin.*";
+          resolver              = "resolver.*";
+          spam-filter-resource  = "spam-filter.resource";
+          authentication        = "authentication.*";
+        };
+
         certificate.default = {
           cert        = "%{file:/var/lib/acme/${homelab.baseDomain}/fullchain.pem}%";
           private-key = "%{file:/var/lib/acme/${homelab.baseDomain}/key.pem}%";
