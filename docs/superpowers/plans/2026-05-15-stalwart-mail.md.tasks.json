@@ -23,44 +23,44 @@
     {
       "id": 3,
       "subject": "Task 3: Deploy and bootstrap Stalwart",
-      "status": "pending",
+      "status": "completed",
       "blockedBy": [0, 1, 2],
       "description": "**Goal:** Apply config, capture admin password, set up Tailscale-only DNS for the admin UI, log in, rotate password, create mailbox, record DKIM key.\n\n**Files:** none\n\n**Verify:** `ssh magic-pylon \"systemctl is-active stalwart-mail\"` returns `active`; admin UI login works\n\n```json:metadata\n{\"files\": [], \"verifyCommand\": \"ssh magic-pylon 'systemctl is-active stalwart-mail'\", \"acceptanceCriteria\": [\"service active\", \"admin UI reachable from Tailscale only\", \"user mailbox created\", \"DKIM key recorded\"]}\n```"
     },
     {
       "id": 4,
       "subject": "Task 4: Cloudflare DNS — inbound mail records",
-      "status": "pending",
+      "status": "completed",
       "blockedBy": [3],
       "description": "**Goal:** Publish DNS records so the public internet can find the mail server and verify SPF/DKIM/DMARC.\n\n**Files:** none\n\n**Verify:** dig queries for MX, A, SPF, DKIM, DMARC all return correct values\n\n```json:metadata\n{\"files\": [], \"verifyCommand\": \"dig +short mx magicsk.eu && dig +short a mail.magicsk.eu && dig +short txt _dmarc.magicsk.eu\", \"acceptanceCriteria\": [\"MX, A, SPF, DKIM, DMARC records all present and queryable\"]}\n```"
     },
     {
       "id": 5,
       "subject": "Task 5: Resend domain verification",
-      "status": "pending",
+      "status": "completed",
       "description": "**Goal:** Add magicsk.eu in Resend dashboard, copy verification records to Cloudflare, confirm verified status.\n\n**Files:** none\n\n**Verify:** Resend dashboard Domains page shows magicsk.eu verified\n\n```json:metadata\n{\"files\": [], \"verifyCommand\": \"\", \"acceptanceCriteria\": [\"domain verified in Resend dashboard\"]}\n```"
     },
     {
       "id": 6,
       "subject": "Task 6: Oracle VPS — iptables port forwarding",
-      "status": "pending",
+      "status": "completed",
       "blockedBy": [3],
       "description": "**Goal:** Forward mail ports from the VPS public IP through wg0 to magic-pylon.\n\n**Files:** none\n\n**Verify:** `nc -vz mail.magicsk.eu 25` from off-LAN connects (after Task 7 also done)\n\n```json:metadata\n{\"files\": [], \"verifyCommand\": \"nc -vz mail.magicsk.eu 25\", \"acceptanceCriteria\": [\"IP forwarding enabled persistently\", \"DNAT rules for 5 mail ports\", \"MASQUERADE rule for return path\", \"rules persisted across reboot\"]}\n```"
     },
     {
       "id": 7,
       "subject": "Task 7: OCI Security List + PTR record",
-      "status": "pending",
+      "status": "completed",
       "blockedBy": [3],
       "description": "**Goal:** Open mail ports at the cloud-firewall layer and set reverse DNS for deliverability.\n\n**Files:** none\n\n**Verify:** `dig -x 132.226.217.72` returns mail.magicsk.eu; `nc -vz mail.magicsk.eu 25` succeeds\n\n```json:metadata\n{\"files\": [], \"verifyCommand\": \"dig -x 132.226.217.72 && nc -vz mail.magicsk.eu 25\", \"acceptanceCriteria\": [\"Security List opened\", \"PTR set to mail.magicsk.eu\", \"external port reachability\"]}\n```"
     },
     {
       "id": 8,
       "subject": "Task 8: End-to-end deliverability verification",
-      "status": "pending",
+      "status": "completed",
       "blockedBy": [4, 5, 6, 7],
       "description": "**Goal:** Prove the full system works — real send/receive, deliverability score, IMAP client configured.\n\n**Files:** none\n\n**Verify:** Gmail outbound passes auth, inbound arrives via IMAP, mail-tester ≥8/10, post-restart still works\n\n```json:metadata\n{\"files\": [], \"verifyCommand\": \"\", \"acceptanceCriteria\": [\"Gmail outbound passes auth\", \"inbound arrival via IMAP\", \"mail-tester >=8/10\", \"post-restart still works\"]}\n```"
     }
   ],
-  "lastUpdated": "2026-05-15T18:50:00Z"
+  "lastUpdated": "2026-05-16T17:30:00Z"
 }
