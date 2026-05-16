@@ -127,6 +127,14 @@ in
           ];
         };
 
+        # Relax Stalwart's strict-by-default EHLO validation on port 25. Many
+        # legitimate senders use non-FQDN EHLOs or have PTR/EHLO mismatches that
+        # the default `reject-non-fqdn = true` would reject with 550 5.5.0.
+        session.ehlo = {
+          require = true;
+          reject-non-fqdn = false;
+        };
+
         # Bootstrap admin: only honored if no equivalent account exists in the directory.
         # Rotate after first login via the admin UI (My Account → Change Password).
         # The plaintext password lives in agenix; ExecStartPre hashes it into
