@@ -114,10 +114,10 @@ in
     };
 
     networking.wg-quick.interfaces.wg0.postUp = ''
-      ${pkgs.iproute2}/bin/ip rule add from ${networkSubnet} table main priority 90
+      ${pkgs.iproute2}/bin/ip rule add from ${networkSubnet} table main priority 86
     '';
     networking.wg-quick.interfaces.wg0.preDown = ''
-      ${pkgs.iproute2}/bin/ip rule del from ${networkSubnet} table main priority 90 || true
+      ${pkgs.iproute2}/bin/ip rule del from ${networkSubnet} table main priority 86 || true
     '';
 
     services.caddy.virtualHosts."${cfg.url}" = {

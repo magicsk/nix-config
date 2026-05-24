@@ -37,5 +37,5 @@ These instructions apply across this repository.
 - Flaresolverr must bypass the VPN on subnet `172.30.12.0/24` because Cloudflare also blocks the VPS public IP.
 - Paperless uses bypass subnet `172.30.13.0/24` for large outbound fetches that fail through the WireGuard MTU path.
 - Tailscale needs both the `100.64.0.0/10` and `100.100.100.100/32` routes through `tailscale0`, plus the `fwmark 0x80000/0xff0000 table main priority 95` bypass for underlay encapsulated packets.
-- When adding a service blocked from the VPS public IP, or a service that runs its own tunnel or overlay, add a WireGuard bypass in `postUp` and `preDown` by UID, source subnet, or fwmark with priority lower than WireGuard rule `5209`.
+- When adding a service blocked from the VPS public IP, or a service that runs its own tunnel or overlay, add a WireGuard bypass in `postUp` and `preDown` by UID, source subnet, or fwmark with priority lower than the generated WireGuard rules. Current service bypasses use priority `86`, before the generated suppress/full-tunnel rules.
 - Podman containers that perform large outbound transfers should use a bypassed network. The current bypassed `/24` subnets are `172.30.12.0/24` for flaresolverr and `172.30.13.0/24` for paperless; choose the next free `172.30.x.0/24` for another bypassed network.
