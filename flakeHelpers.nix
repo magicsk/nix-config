@@ -39,6 +39,7 @@ in
         ./homelab
         ./machines/nixos/_common
         ./machines/nixos/${machineHostname}
+        ./modules/git-websites
         ./modules/qbittorrent
         inputs.agenix.nixosModules.default
         inputs.autoaspm.nixosModules.default
@@ -52,4 +53,3 @@ in
     a: b: inputs.nixpkgs.lib.attrsets.recursiveUpdate a b
   ) { };
 }
-

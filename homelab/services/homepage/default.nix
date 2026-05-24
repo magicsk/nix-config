@@ -14,7 +14,7 @@ in
     enable = lib.mkEnableOption {
       description = "Enable ${service}";
     };
-    misc = lib.mkOption {
+    network = lib.mkOption {
       default = [ ];
       type = lib.types.listOf (
         lib.types.attrsOf (
@@ -27,7 +27,9 @@ in
                 type = lib.types.str;
               };
               siteMonitor = lib.mkOption {
-                type = lib.types.str;
+                type = lib.types.nullOr lib.types.str;
+                default = null;
+                description = "Optional Homepage site monitor URL.";
               };
               icon = lib.mkOption {
                 type = lib.types.str;
@@ -44,30 +46,6 @@ in
       enable = true;
       package = pkgs-unstable.homepage-dashboard;
       environmentFile = builtins.toFile "homepage.env" "HOMEPAGE_ALLOWED_HOSTS=lab.${homelab.baseDomain}";
-      customCSS = ''
-        body, html {
-          font-family: SF Pro Display, Helvetica, Arial, sans-serif !important;
-        }
-        .font-medium {
-          font-weight: 700 !important;
-        }
-        .font-light {
-          font-weight: 500 !important;
-        }
-        .font-thin {
-          font-weight: 400 !important;
-        }
-        #information-widgets {
-          padding-left: 1.5rem;
-          padding-right: 1.5rem;
-        }
-        div#footer {
-          display: none;
-        }
-        .services-group.basis-full.flex-1.px-1.-my-1 {
-          padding-bottom: 3rem;
-        };
-      '';
       settings = {
         layout = [
           {
@@ -78,42 +56,66 @@ in
             };
           }
           {
-            Arr = {
-              header = true;
-              style = "column";
-            };
-          }
-          {
-            Downloads = {
-              header = true;
-              style = "column";
-            };
-          }
-          {
             Media = {
               header = true;
-              style = "column";
+              style = "row";
+              columns = 2;
             };
           }
           {
             Services = {
               header = true;
-              style = "column";
+              style = "row";
+              columns = 4;
+            };
+          }
+          {
+            "Smart Home" = {
+              header = true;
+              style = "row";
+              columns = 3;
+            };
+          }
+          {
+            Network = {
+              header = true;
+              style = "row";
+              columns = 3;
+            };
+          }
+          {
+            Sites = {
+              header = true;
+              style = "row";
+              columns = 3;
+            };
+          }
+          {
+            Arr = {
+              header = true;
+              style = "row";
+              columns = 3;
             };
           }
         ];
         headerStyle = "clean";
         statusStyle = "dot";
         hideVersion = "true";
+        background = {
+          image = "https://raw.githubusercontent.com/gethomepage/homepage/main/docs/assets/blossom_valley.jpg";
+          opacity = 55;
+        };
+        cardBlur = "sm";
       };
       services =
         let
           homepageCategories = [
             "Arr"
             "Media"
-            "Downloads"
             "Services"
             "Smart Home"
+            "Sites"
+            "Network"
           ];
           hl = config.homelab.services;
           homepageServices =
@@ -121,23 +123,80 @@ in
             (lib.attrsets.filterAttrs (
               name: value: value ? homepage && value.enable && value.homepage.category == x
             ) homelab.services);
+          serviceEntry =
+            x:
+            let
+              serviceCfg = hl.${x};
+              homepageCfg = serviceCfg.homepage;
+            in
+            {
+              "${homepageCfg.name}" =
+                {
+                  icon = homepageCfg.icon;
+                  description = homepageCfg.description;
+                  href = "https://${serviceCfg.url}";
+                }
+                // lib.optionalAttrs (homepageCfg.siteMonitor or true) {
+                  siteMonitor = "https://${serviceCfg.url}";
+                }
+                // lib.optionalAttrs (homepageCfg ? widget && homepageCfg.widget != null) {
+                  widget = homepageCfg.widget;
+                }
+                // lib.optionalAttrs (homepageCfg ? widgets && homepageCfg.widgets != null) {
+                  widgets = homepageCfg.widgets;
+                };
+            };
+          websiteServices =
+            x:
+            (lib.attrsets.filterAttrs (
+              name: value:
+              config.services.git-websites.enable && value.enable && value.homepage.category == x
+            ) config.services.git-websites.sites);
+          websiteEntry =
+            x:
+            let
+              site = config.services.git-websites.sites.${x};
+            in
+            {
+              "${site.homepage.name}" =
+                {
+                  icon = site.homepage.icon;
+                  description = site.homepage.description;
+                  href = "https://${site.host}";
+                }
+                // lib.optionalAttrs site.homepage.siteMonitor {
+                  siteMonitor =
+                    if site.homepage.siteMonitorUrl != null then
+                      site.homepage.siteMonitorUrl
+                    else
+                      "https://${site.host}";
+                }
+                // lib.optionalAttrs (site.homepage.widget != null) {
+                  widget = site.homepage.widget;
+                }
+                // lib.optionalAttrs (site.homepage.widgets != null) {
+                  widgets = site.homepage.widgets;
+                };
+            };
+          networkEntry =
+            entry:
+            lib.mapAttrs (_: value: lib.filterAttrs (_: fieldValue: fieldValue != null) value) entry;
+          categoryExtra =
+            cat:
+            if cat == "Network" then
+              map networkEntry cfg.network
+            else
+              [ ];
         in
         lib.lists.forEach homepageCategories (cat: {
           "${cat}" =
             lib.lists.forEach (lib.attrsets.mapAttrsToList (name: value: name) (homepageServices "${cat}"))
-              (x: {
-                "${hl.${x}.homepage.name}" =
-                  {
-                    icon = hl.${x}.homepage.icon;
-                    description = hl.${x}.homepage.description;
-                    href = "https://${hl.${x}.url}";
-                  }
-                  // lib.optionalAttrs (hl.${x}.homepage.siteMonitor or true) {
-                    siteMonitor = "https://${hl.${x}.url}";
-                  };
-              });
+              serviceEntry
+            ++ lib.lists.forEach (
+              lib.attrsets.mapAttrsToList (name: value: name) (websiteServices "${cat}")
+            ) websiteEntry
+            ++ categoryExtra cat;
         })
-        ++ [ { Misc = cfg.misc; } ]
         ++ [
           {
             Glances =

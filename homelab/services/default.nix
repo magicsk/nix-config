@@ -157,6 +157,7 @@ in
     ./esphome
     ./flaresolverr
     ./go2rtc
+    ./headscale
     ./homeassistant
     ./homepage
     ./immich
@@ -178,6 +179,7 @@ in
     ./trakt-backup
     # ./uptime-kuma
     ./vaultwarden
+    ./websites
     ./zigbee2mqtt
   ];
 }

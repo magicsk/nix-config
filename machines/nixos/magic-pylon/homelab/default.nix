@@ -50,11 +50,10 @@ in
       borg-ui.enable = true;
       homepage = {
         enable = true;
-        misc = [
+        network = [
           {
             "Router" = {
               href = "http://magic-port.local";
-              siteMonitor = "http://magic-port.local";
               description = "OpenWrt";
               icon = "sh-openwrt-light.svg";
             };
@@ -62,7 +61,6 @@ in
           {
             "Access point" = {
               href = "http://wifi-ap.local";
-              siteMonitor = "http://wifi-ap.local";
               description = "WiFi AP";
               icon = "mdi-wifi";
             };
@@ -70,7 +68,6 @@ in
           {
             "ISP Box" = {
               href = "http://192.168.100.1";
-              siteMonitor = "http://192.168.100.1";
               description = "ISP Box";
               icon = "mdi-lan";
             };
@@ -126,12 +123,21 @@ in
       affine.enable = true;
       flaresolverr.enable = true;
       go2rtc.enable = true;
+      headscale.enable = true;
       obico-ml.enable = true;
       trakt-backup.enable = true;
       stalwart = {
         enable = true;
         resendApiKeyFile = config.age.secrets.resendApiKey.path;
         adminPasswordFile = config.age.secrets.stalwartAdminPassword.path;
+      };
+      websites = {
+        enable = true;
+        startpage.enable = true;
+        api.enable = true;
+        maxmiedinger.enable = true;
+        reciper.enable = true;
+        transi-eu.enable = true;
       };
     };
   };
