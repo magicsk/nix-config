@@ -23,7 +23,7 @@ in
       manageAcme = false;
       homepage = {
         name = "Reciper";
-        description = "Recipe app";
+        description = "AI Recipe app";
         icon = "mdi-silverware-fork-knife";
       };
     };

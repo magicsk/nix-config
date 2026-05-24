@@ -32,8 +32,9 @@ in
       acmeHost = homelab.baseDomain;
       manageAcme = false;
       homepage = {
-        name = "API";
-        description = "Public API";
+        name = "Magic API";
+        
+        description = "API for Transi and other";
         icon = "mdi-api";
         siteMonitorUrl = "https://api.${homelab.baseDomain}/timetable/manifest";
       };

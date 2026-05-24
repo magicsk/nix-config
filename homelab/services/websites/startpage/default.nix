@@ -21,8 +21,8 @@ in
       acmeHost = homelab.baseDomain;
       manageAcme = false;
       homepage = {
-        name = "Startpage";
-        description = "Public homepage";
+        name = "Magic Homepage";
+        description = "Startpage";
         icon = "mdi-home";
       };
     };

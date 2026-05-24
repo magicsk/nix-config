@@ -45,7 +45,7 @@ in
     };
     homepage.icon = lib.mkOption {
       type = lib.types.str;
-      default = "bugsink.svg";
+      default = "sh-bugsink.png";
     };
     homepage.category = lib.mkOption {
       type = lib.types.str;

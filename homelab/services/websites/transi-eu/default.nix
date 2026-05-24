@@ -22,7 +22,7 @@ in
       acmeCredentialsFile = homelab.cloudflare.dnsCredentialsFile;
       homepage = {
         name = "Transi";
-        description = "Transit website";
+        description = "Site about the app";
         icon = "mdi-train";
       };
     };
