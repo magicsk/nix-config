@@ -42,6 +42,7 @@ in
   };
 
   programs.fuse.userAllowOther = true;
+  programs.nix-ld.enable = true;
   
   boot = {
     kernelParams = [
@@ -55,6 +56,11 @@ in
       "jc42"
       "lm78"
     ];
+    # Interim mitigations until kernel ≥ 6.12.88 lands:
+    #   algif_aead  → CopyFail (CVE-2026-31431) LPE via AF_ALG
+    #   esp4/esp6   → Dirty Frag (CVE-2026-43284) xfrm-ESP page-cache write; WireGuard is unaffected
+    #   rxrpc       → Dirty Frag (CVE-2026-43500); AFS is not used here
+    blacklistedKernelModules = [ "algif_aead" "esp4" "esp6" "rxrpc" ];
     loader = {
       systemd-boot.enable = true;
       efi.canTouchEfiVariables = true;
