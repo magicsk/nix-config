@@ -61,7 +61,10 @@
     ];
   };
 
-  programs.git.enable = true;
+  programs.git = {
+    enable = true;
+    config.safe.directory = "/etc/nixos";
+  };
   programs.mosh.enable = true;
   programs.htop.enable = true;
   programs.neovim = {
