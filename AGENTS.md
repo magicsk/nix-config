@@ -27,6 +27,7 @@ These instructions apply across this repository.
 - Public Git-deployed websites are managed through `homelab.services.websites`; restarting a `website-*` service pulls the repo and rebuilds before serving or starting it.
 - Headscale still runs on the Oracle VPS. `homelab.services.headscale` only adds the `hs.magicsk.eu` Caddy reverse proxy on `magic-pylon`, with upstream `http://172.16.16.1:8080` over WireGuard; the VPS headscale service listens on `0.0.0.0:8080` and `/etc/iptables/rules.v4` allows TCP/8080 from `wg0`.
 - `magic-pylon` is reachable with `ssh magic_sk@magic-pylon.local` for debugging, container status, and logs.
+- On `magic-pylon`, root traffic still uses the WireGuard route; GitHub/GHCR can fail there with TLS internal errors. For rebuilds that need GitHub fetches, build as `magic_sk`, then switch the exact built system path with sudo.
 
 ## magic-pylon WireGuard Routing
 
