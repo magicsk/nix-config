@@ -103,6 +103,7 @@ in
         url = "bs.${config.homelab.baseDomain}";
         environmentFile = config.age.secrets.bugsinkEnv.path;
       };
+      changedetection-io.enable = true;
       code-server = {
         enable = true;
         passFile = config.age.secrets.codeServerPassword.path;

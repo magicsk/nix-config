@@ -19,6 +19,7 @@ let
       (portClaim "affine" 3010 hl.affine.enable)
       (portClaim "borg-ui" 8084 hl."borg-ui".enable)
       (portClaim "bugsink" hl.bugsink.port hl.bugsink.enable)
+      (portClaim "changedetection-io" hl."changedetection-io".port hl."changedetection-io".enable)
       (portClaim "claude-wrapper" 8090 hl."claude-wrapper".enable)
       (portClaim "code-server" 8443 hl."code-server".enable)
       (portClaim "esphome" config.services.esphome.port hl.esphome.enable)
@@ -152,6 +153,7 @@ in
     ./backup
     ./borg-ui
     ./bugsink
+    ./changedetection-io
     ./claude-wrapper
     ./code-server
     ./esphome
