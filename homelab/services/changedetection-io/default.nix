@@ -43,32 +43,60 @@ in
   config = lib.mkIf cfg.enable {
     virtualisation = {
       podman.enable = true;
-      oci-containers.containers.${service} = {
-        image = "docker.io/dgtlmoon/changedetection.io:latest";
-        autoStart = true;
-        volumes = [
-          "${cfg.dataDir}:/datastore"
-        ];
-        ports = [
-          "127.0.0.1:${toString cfg.port}:5000"
-        ];
-        extraOptions = [ "--network=${service}" ];
-        environment = {
-          TZ = homelab.timeZone;
-          BASE_URL = "https://${cfg.url}";
-          USE_X_SETTINGS = "1";
-          PORT = "5000";
-          PUID = toString config.users.users.${homelab.user}.uid;
-          PGID = toString config.users.groups.${homelab.group}.gid;
+      oci-containers.containers = {
+        "browser-chrome" = {
+          image = "docker.io/selenium/standalone-chrome:4";
+          autoStart = true;
+          volumes = [
+            "/dev/shm:/dev/shm"
+          ];
+          extraOptions = [
+            "--network=${service}"
+            "--hostname=browser-chrome"
+          ];
+          environment = {
+            VNC_NO_PASSWORD = "1";
+            SCREEN_WIDTH = "1920";
+            SCREEN_HEIGHT = "1080";
+            SCREEN_DEPTH = "24";
+          };
+        };
+
+        ${service} = {
+          image = "docker.io/dgtlmoon/changedetection.io:latest";
+          autoStart = true;
+          volumes = [
+            "${cfg.dataDir}:/datastore"
+          ];
+          ports = [
+            "127.0.0.1:${toString cfg.port}:5000"
+          ];
+          extraOptions = [ "--network=${service}" ];
+          dependsOn = [ "browser-chrome" ];
+          environment = {
+            TZ = homelab.timeZone;
+            BASE_URL = "https://${cfg.url}";
+            USE_X_SETTINGS = "1";
+            PORT = "5000";
+            WEBDRIVER_URL = "http://browser-chrome:4444/wd/hub";
+            PUID = toString config.users.users.${homelab.user}.uid;
+            PGID = toString config.users.groups.${homelab.group}.gid;
+          };
         };
       };
     };
 
     systemd.services."podman-network-${service}" = {
       description = "Create Podman network for ${service}";
-      before = [ "podman-${service}.service" ];
+      before = [
+        "podman-${service}.service"
+        "podman-browser-chrome.service"
+      ];
       after = [ "podman.service" ];
-      requiredBy = [ "podman-${service}.service" ];
+      requiredBy = [
+        "podman-${service}.service"
+        "podman-browser-chrome.service"
+      ];
       path = [ pkgs.podman ];
       script = ''
         podman network inspect ${service} > /dev/null 2>&1 || \
