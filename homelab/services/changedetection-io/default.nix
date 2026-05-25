@@ -1,8 +1,9 @@
-{ config, lib, ... }:
+{ config, lib, pkgs, ... }:
 let
   service = "changedetection-io";
   cfg = config.homelab.services.${service};
   homelab = config.homelab;
+  networkSubnet = "172.30.14.0/24";
 in
 {
   options.homelab.services.${service} = {
@@ -51,6 +52,7 @@ in
         ports = [
           "127.0.0.1:${toString cfg.port}:5000"
         ];
+        extraOptions = [ "--network=${service}" ];
         environment = {
           TZ = homelab.timeZone;
           BASE_URL = "https://${cfg.url}";
@@ -61,6 +63,31 @@ in
         };
       };
     };
+
+    systemd.services."podman-network-${service}" = {
+      description = "Create Podman network for ${service}";
+      before = [ "podman-${service}.service" ];
+      after = [ "podman.service" ];
+      requiredBy = [ "podman-${service}.service" ];
+      path = [ pkgs.podman ];
+      script = ''
+        podman network inspect ${service} > /dev/null 2>&1 || \
+          podman network create --subnet ${networkSubnet} ${service}
+      '';
+      serviceConfig = {
+        Type = "oneshot";
+        RemainAfterExit = true;
+      };
+    };
+
+    # changedetection.io fetches arbitrary public sites; route those checks over
+    # the home connection instead of the WireGuard VPS path.
+    networking.wg-quick.interfaces.wg0.postUp = ''
+      ${pkgs.iproute2}/bin/ip rule add from ${networkSubnet} table main priority 86
+    '';
+    networking.wg-quick.interfaces.wg0.preDown = ''
+      ${pkgs.iproute2}/bin/ip rule del from ${networkSubnet} table main priority 86 || true
+    '';
 
     services.caddy.virtualHosts."${cfg.url}" = {
       useACMEHost = homelab.baseDomain;

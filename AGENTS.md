@@ -26,6 +26,7 @@ These instructions apply across this repository.
 - When adding a new service module, also enable it in `machines/nixos/magic-pylon/homelab/default.nix` under `homelab.services`.
 - Public Git-deployed websites are managed through `homelab.services.websites`; restarting a `website-*` service pulls the repo and rebuilds before serving or starting it.
 - Headscale still runs on the Oracle VPS. `homelab.services.headscale` only adds the `hs.magicsk.eu` Caddy reverse proxy on `magic-pylon`, with upstream `http://172.16.16.1:8080` over WireGuard; the VPS headscale service listens on `0.0.0.0:8080` and `/etc/iptables/rules.v4` allows TCP/8080 from `wg0`.
+- Oracle VPS public-ingress DNAT rules must be scoped to `-i ens3`. Unscoped port 80/443 DNAT catches `wg0` egress from `magic-pylon` and loops arbitrary outbound HTTPS back to Caddy, causing TLS internal errors.
 - `magic-pylon` is reachable with `ssh magic_sk@magic-pylon.local` for debugging, container status, and logs.
 - On `magic-pylon`, root traffic still uses the WireGuard route; GitHub/GHCR can fail there with TLS internal errors. For rebuilds that need GitHub fetches, build as `magic_sk`, then switch the exact built system path with sudo.
 
@@ -37,6 +38,7 @@ These instructions apply across this repository.
 - Home Assistant/HACS must bypass the VPN by the `homelab.user` UID because GitHub rejects TLS handshakes from the VPS path.
 - Flaresolverr must bypass the VPN on subnet `172.30.12.0/24` because Cloudflare also blocks the VPS public IP.
 - Paperless uses bypass subnet `172.30.13.0/24` for large outbound fetches that fail through the WireGuard MTU path.
+- changedetection.io uses bypass subnet `172.30.14.0/24` so monitored website checks leave through the home connection, not the VPS tunnel.
 - Tailscale needs both the `100.64.0.0/10` and `100.100.100.100/32` routes through `tailscale0`, plus the `fwmark 0x80000/0xff0000 table main priority 95` bypass for underlay encapsulated packets.
 - When adding a service blocked from the VPS public IP, or a service that runs its own tunnel or overlay, add a WireGuard bypass in `postUp` and `preDown` by UID, source subnet, or fwmark with priority lower than the generated WireGuard rules. Current service bypasses use priority `86`, before the generated suppress/full-tunnel rules.
-- Podman containers that perform large outbound transfers should use a bypassed network. The current bypassed `/24` subnets are `172.30.12.0/24` for flaresolverr and `172.30.13.0/24` for paperless; choose the next free `172.30.x.0/24` for another bypassed network.
+- Podman containers that perform large outbound transfers or arbitrary public web fetches should use a bypassed network. The current bypassed `/24` subnets are `172.30.12.0/24` for flaresolverr, `172.30.13.0/24` for paperless, and `172.30.14.0/24` for changedetection.io; choose the next free `172.30.x.0/24` for another bypassed network.
