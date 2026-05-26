@@ -104,6 +104,7 @@ in
         environmentFile = config.age.secrets.bugsinkEnv.path;
       };
       changedetection-io.enable = true;
+      html2rss-web.enable = true;
       code-server = {
         enable = true;
         passFile = config.age.secrets.codeServerPassword.path;

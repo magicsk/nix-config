@@ -27,6 +27,7 @@ let
       (portClaim "go2rtc-http" 1984 hl.go2rtc.enable)
       (portClaim "go2rtc-webrtc" 8555 hl.go2rtc.enable)
       (portClaim "homeassistant" 8123 hl.homeassistant.enable)
+      (portClaim "html2rss-web" hl."html2rss-web".port hl."html2rss-web".enable)
       (portClaim "homepage" config.services."homepage-dashboard".listenPort hl.homepage.enable)
       (portClaim "immich" config.services.immich.port hl.immich.enable)
       (portClaim "jellyfin" 8096 hl.jellyfin.enable)
@@ -161,6 +162,7 @@ in
     ./go2rtc
     ./headscale
     ./homeassistant
+    ./html2rss-web
     ./homepage
     ./immich
     ./jellyfin
