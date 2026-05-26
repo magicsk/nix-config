@@ -78,7 +78,7 @@ in
             GIT_SHA = "nixos";
             SENTRY_DSN = "";
             SENTRY_ENABLE_LOGS = "false";
-            AUTO_SOURCE_ENABLED = "false";
+            AUTO_SOURCE_ENABLED = "true";
             BROWSERLESS_IO_WEBSOCKET_URL = "ws://${browserlessService}:${toString cfg.browserlessPort}";
           };
           environmentFiles = [
@@ -126,6 +126,9 @@ in
         if [ -z "''${HEALTH_CHECK_TOKEN:-}" ]; then
           HEALTH_CHECK_TOKEN="$(openssl rand -hex 24)"
         fi
+        if [ -z "''${HTML2RSS_ACCESS_TOKEN:-}" ]; then
+          HTML2RSS_ACCESS_TOKEN="$(openssl rand -hex 24)"
+        fi
         if [ -z "''${BROWSERLESS_IO_API_TOKEN:-}" ]; then
           BROWSERLESS_IO_API_TOKEN="$(openssl rand -hex 24)"
         fi
@@ -134,6 +137,7 @@ in
         cat > "$tmp_html" <<EOF
 HTML2RSS_SECRET_KEY=$HTML2RSS_SECRET_KEY
 HEALTH_CHECK_TOKEN=$HEALTH_CHECK_TOKEN
+HTML2RSS_ACCESS_TOKEN=$HTML2RSS_ACCESS_TOKEN
 BROWSERLESS_IO_API_TOKEN=$BROWSERLESS_IO_API_TOKEN
 EOF
         install -m 0600 "$tmp_html" "$html_env"
