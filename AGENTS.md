@@ -16,6 +16,7 @@ These instructions apply across this repository.
 
 - `magic-pylon` enables `programs.nix-ld` so generic dynamically linked Linux binaries can run; Warp's SSH extension remote server depends on this.
 - Every service with persistent data must declare `environment.persistence."/"`; otherwise its data can be lost after rebuilds.
+- Persistent service config/data directories should be owned by `homelab.user`/`homelab.group`, or otherwise be readable and writable by the intended operator or service-specific user; avoid root-only persistent directories unless secrets or upstream ownership requirements demand it.
 - `homepage.*` options feed the generated homepage dashboard. Add them only for services with a web UI.
 - For Homepage selfh.st icons (`sh-*`), use the default PNG form or an explicit `.png`/`.webp` when the selfh.st index does not provide SVG; forcing `.svg` breaks icons such as Bugsink.
 - Services without a web UI should not define `homepage.*` and should not define a `url` solely for homepage generation.
