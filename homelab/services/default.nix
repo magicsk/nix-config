@@ -44,7 +44,7 @@ let
       (portClaim "prowlarr" 9696 hl.prowlarr.enable)
       (portClaim "qbittorrent" 8112 hl.qbittorrent.enable)
       (portClaim "radarr" 7878 hl.radarr.enable)
-      (portClaim "redlib" config.services.redlib.port hl.redlib.enable)
+      (portClaim "redlib" hl.redlib.port hl.redlib.enable)
       (portClaim "sonarr" 8989 hl.sonarr.enable)
       (portClaim "vaultwarden" 8222 hl.vaultwarden.enable)
       (portClaim "zigbee2mqtt" 8181 hl.zigbee2mqtt.enable)

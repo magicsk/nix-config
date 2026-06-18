@@ -57,7 +57,6 @@ in
         }
       ];
       postUp = ''
-        ${pkgs.iproute2}/bin/ip rule add uidrange 994-994 table main
         ${pkgs.iproute2}/bin/ip rule add fwmark 0x80000/0xff0000 table main priority 95
         ${pkgs.iproute2}/bin/ip route add 100.64.0.0/10 dev tailscale0 table main
         ${pkgs.iproute2}/bin/ip route add 100.100.100.100/32 dev tailscale0 table main
@@ -66,7 +65,6 @@ in
         ${pkgs.iproute2}/bin/ip route del 100.100.100.100/32 dev tailscale0 table main || true
         ${pkgs.iproute2}/bin/ip route del 100.64.0.0/10 dev tailscale0 table main || true
         ${pkgs.iproute2}/bin/ip rule del fwmark 0x80000/0xff0000 table main priority 95 || true
-        ${pkgs.iproute2}/bin/ip rule del uidrange 994-994 table main
       '';
   };
   systemd.services."wg-quick-wg0" = {
