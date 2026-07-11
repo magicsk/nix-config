@@ -280,6 +280,7 @@ let
           Group = site.group;
           WorkingDirectory = site.dataDir;
           ExecStart = getExe updater;
+          TimeoutStartSec = "15min";
         };
         wantedBy = [ "multi-user.target" ];
       }
@@ -308,6 +309,7 @@ let
           ExecStart = getExe starter;
           Restart = "on-failure";
           RestartSec = "5s";
+          TimeoutStartSec = "15min";
         };
         wantedBy = [ "multi-user.target" ];
       };

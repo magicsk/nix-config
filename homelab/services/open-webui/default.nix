@@ -53,16 +53,22 @@ in
       };
     };
 
-    users.groups.${service} = {};
+    users.groups.${service} = { };
     users.users.${service} = {
       group = service;
       isSystemUser = true;
     };
 
-    systemd.services.${service}.serviceConfig = {
-      DynamicUser = lib.mkForce false;
-      User = service;
-      Group = service;
+    systemd.services.${service} = {
+      serviceConfig = {
+        DynamicUser = lib.mkForce false;
+        User = service;
+        Group = service;
+      };
+    }
+    // lib.optionalAttrs config.homelab.services."codex-wrapper".enable {
+      wants = [ "codex-wrapper.service" ];
+      after = [ "codex-wrapper.service" ];
     };
 
     services.caddy.virtualHosts."${cfg.url}" = {
@@ -74,7 +80,12 @@ in
 
     environment.persistence."/" = {
       directories = [
-        { directory = cfg.dataDir; user = service; group = service; mode = "0755"; }
+        {
+          directory = cfg.dataDir;
+          user = service;
+          group = service;
+          mode = "0755";
+        }
       ];
     };
   };

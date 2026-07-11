@@ -110,10 +110,7 @@ in
         passFile = config.age.secrets.codeServerPassword.path;
         passSudoFile = config.age.secrets.codeServerSudoPassword.path;
       };
-      claude-wrapper = {
-        enable = false;
-        ghcrTokenFile = config.age.secrets.githubPackagesToken.path;
-      };
+      codex-wrapper.enable = true;
       open-webui.enable = true;
       esphome.enable = true;
       otbr.enable = true;

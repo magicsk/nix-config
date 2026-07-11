@@ -63,6 +63,7 @@ in
             "${cfg.consumptionDir}:/usr/src/paperless/consume"
           ];
           environment = {
+            PAPERLESS_BIND_ADDR = "0.0.0.0";
             PAPERLESS_REDIS = "redis://${service}-redis:6379";
             PAPERLESS_URL = "https://${cfg.url}";
             PAPERLESS_OCR_LANGUAGE = "slk+eng";

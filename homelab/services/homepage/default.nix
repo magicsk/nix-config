@@ -45,7 +45,9 @@ in
     services.${service} = {
       enable = true;
       package = pkgs-unstable.homepage-dashboard;
-      environmentFile = builtins.toFile "homepage.env" "HOMEPAGE_ALLOWED_HOSTS=lab.${homelab.baseDomain}";
+      environmentFiles = [
+        (builtins.toFile "homepage.env" "HOMEPAGE_ALLOWED_HOSTS=lab.${homelab.baseDomain}")
+      ];
       settings = {
         layout = [
           {

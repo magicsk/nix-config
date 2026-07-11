@@ -45,6 +45,7 @@ in
     systemd.services.immich-server.serviceConfig.UMask = lib.mkForce "0007";
     fileSystems."${cfg.dataDir}/library" = {
       device = "${config.homelab.mounts.Nitor}/Photos";
+      fsType = "none";
       options = [ "bind" ];
     };
     users.users.${service}.extraGroups = [

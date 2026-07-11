@@ -7,20 +7,18 @@
 let
   hl = config.homelab.services;
   portClaim = name: port: enabled: { inherit name port enabled; };
-  reservedPortClaims =
-    map (claim: {
-      inherit (claim) name port;
-      enabled = true;
-    }) hl.reservedPorts;
+  reservedPortClaims = map (claim: {
+    inherit (claim) name port;
+    enabled = true;
+  }) hl.reservedPorts;
   enabledPortClaims =
     reservedPortClaims
-    ++
-    lib.filter (claim: claim.enabled) [
+    ++ lib.filter (claim: claim.enabled) [
       (portClaim "affine" 3010 hl.affine.enable)
       (portClaim "borg-ui" 8084 hl."borg-ui".enable)
       (portClaim "bugsink" hl.bugsink.port hl.bugsink.enable)
       (portClaim "changedetection-io" hl."changedetection-io".port hl."changedetection-io".enable)
-      (portClaim "claude-wrapper" 8090 hl."claude-wrapper".enable)
+      (portClaim "codex-wrapper" hl."codex-wrapper".port hl."codex-wrapper".enable)
       (portClaim "code-server" 8443 hl."code-server".enable)
       (portClaim "esphome" config.services.esphome.port hl.esphome.enable)
       (portClaim "flaresolverr" 8191 hl.flaresolverr.enable)
@@ -155,7 +153,7 @@ in
     ./borg-ui
     ./bugsink
     ./changedetection-io
-    ./claude-wrapper
+    ./codex-wrapper
     ./code-server
     ./esphome
     ./flaresolverr

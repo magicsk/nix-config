@@ -11,7 +11,8 @@ let
   dbName = svcUser;
   dbUser = svcUser;
 
-  # nixpkgs 25.11 still ships the module as services.stalwart-mail with user/group stalwart-mail.
+  # The service was first enabled before NixOS 26.05, so keep the legacy
+  # user/group and state layout while using the renamed 26.05 module/unit.
   svcUser  = "stalwart-mail";
   svcGroup = "stalwart-mail";
 in
@@ -57,13 +58,16 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    services.stalwart-mail = {
+    services.stalwart = {
       enable = true;
+      stateVersion = "25.11";
       package = pkgs.stalwart-mail;
       openFirewall = false;
+      user = svcUser;
+      group = svcGroup;
 
       # systemd LoadCredential reads the agenix-decrypted file as root and exposes it
-      # as a per-unit credential at /run/credentials/stalwart-mail.service/resendApiKey.
+      # as a per-unit credential at /run/credentials/stalwart.service/resendApiKey.
       credentials = {
         resendApiKey  = toString cfg.resendApiKeyFile;
         adminPassword = toString cfg.adminPasswordFile;
@@ -146,7 +150,7 @@ in
           auth = {
             username = "resend";
             # Secret loaded via systemd LoadCredential (credentials option above).
-            secret = "%{file:/run/credentials/stalwart-mail.service/resendApiKey}%";
+            secret = "%{file:/run/credentials/stalwart.service/resendApiKey}%";
           };
         };
 
@@ -210,7 +214,7 @@ in
     networking.firewall.allowedTCPPorts = [ 25 465 587 143 993 ];
 
     security.acme.certs."${homelab.baseDomain}".reloadServices = [
-      "stalwart-mail.service"
+      "stalwart.service"
     ];
     # Add stalwart-mail to the homelab user's group so it can write into the
     # persistence dir owned by ${homelab.user}; this keeps mail files
@@ -229,7 +233,7 @@ in
       { directory = cfg.dataDir; user = homelab.user; group = homelab.group; mode = "2770"; }
     ];
 
-    systemd.services.stalwart-mail = {
+    systemd.services.stalwart = {
       after    = [ "postgresql.service" ];
       requires = [ "postgresql.service" ];
       serviceConfig = {

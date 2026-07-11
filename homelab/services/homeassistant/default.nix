@@ -1,13 +1,11 @@
 {
   config,
   lib,
-  pkgs,
   ...
 }:
 let
   homelab = config.homelab;
   cfg = config.homelab.services.homeassistant;
-  homeassistantUid = config.users.users.${homelab.user}.uid;
 in
 {
   options.homelab.services.homeassistant = {
@@ -55,15 +53,6 @@ in
         reverse_proxy http://127.0.0.1:8123
       '';
     };
-
-    # Home Assistant runs on the host network as homelab.user via linuxserver's PUID.
-    # GitHub rejects TLS handshakes from the WireGuard VPS path, which breaks HACS downloads.
-    networking.wg-quick.interfaces.wg0.postUp = ''
-      ${pkgs.iproute2}/bin/ip rule add uidrange ${toString homeassistantUid}-${toString homeassistantUid} table main priority 86
-    '';
-    networking.wg-quick.interfaces.wg0.preDown = ''
-      ${pkgs.iproute2}/bin/ip rule del uidrange ${toString homeassistantUid}-${toString homeassistantUid} table main priority 86 || true
-    '';
 
     virtualisation = {
       podman.enable = true;
