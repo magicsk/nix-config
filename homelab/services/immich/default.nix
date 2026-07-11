@@ -1,4 +1,4 @@
-{ config, lib, ... }:
+{ config, lib, pkgs-unstable, ... }:
 let
   service = "immich";
   cfg = config.homelab.services.immich;
@@ -53,6 +53,7 @@ in
       "render"
     ];
     services.${service} = {
+      package = pkgs-unstable.immich;
       group = homelab.group;
       enable = true;
       host = "0.0.0.0";

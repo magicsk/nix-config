@@ -41,6 +41,7 @@ These instructions apply across this repository.
 - On 26.05, bind mounts declared in `fileSystems` need explicit `fsType = "none"`.
 - `services.stalwart-mail` was renamed to `services.stalwart` on 26.05; for pre-26.05 Stalwart data, keep `stateVersion = "25.11"` and the legacy user/group when needed.
 - On 26.05, `pkgs.nodejs_20` is insecure/EOL; `homelab.services.codex-wrapper` should use the supported default `pkgs.nodejs`.
+- Immich intentionally uses `pkgs-unstable.immich` while the base system stays stable because stable nixpkgs can lag major Immich releases; keep the server and machine-learning packages aligned and take a PostgreSQL dump before major upgrades.
 
 ## magic-pylon WireGuard Routing
 
