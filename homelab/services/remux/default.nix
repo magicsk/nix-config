@@ -1,74 +1,65 @@
 { config, lib, pkgs, ... }:
 let
-  service = "redlib";
+  service = "remux";
   cfg = config.homelab.services.${service};
   homelab = config.homelab;
-  networkSubnet = "172.30.16.0/24";
+  networkSubnet = "172.30.17.0/24";
 in
 {
   options.homelab.services.${service} = {
-    enable = lib.mkEnableOption {
-      description = "Enable ${service}";
+    enable = lib.mkEnableOption "Remux media server";
+    dataDir = lib.mkOption {
+      type = lib.types.str;
+      default = "${homelab.mounts.config}/${service}";
     };
     url = lib.mkOption {
       type = lib.types.str;
-      default = "redlib.${homelab.baseDomain}";
+      default = "${service}.${homelab.baseDomain}";
     };
     port = lib.mkOption {
       type = lib.types.port;
-      default = 8282;
+      default = 3001;
     };
     homepage.name = lib.mkOption {
       type = lib.types.str;
-      default = "redlib";
+      default = "Remux";
     };
     homepage.description = lib.mkOption {
       type = lib.types.str;
-      default = "Alternative front-end for reddit";
+      default = "Jellyfin-compatible media server";
     };
     homepage.icon = lib.mkOption {
       type = lib.types.str;
-      default = "redlib.svg";
+      default = "mdi-movie-open-play-outline";
     };
     homepage.category = lib.mkOption {
       type = lib.types.str;
-      default = "Services";
-    };
-    homepage.siteMonitor = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      description = "Whether homepage should probe ${service} for status.";
+      default = "Media";
     };
   };
+
   config = lib.mkIf cfg.enable {
-    # The published Quay image currently uses a broken upstream build path. Build
-    # this pinned commit locally with Dockerfile.ubuntu and validate it before
-    # bumping the tag; the nixpkgs build still lacks the current Reddit TLS client.
     virtualisation = {
       podman.enable = true;
       oci-containers.containers.${service} = {
-        image = "localhost/redlib:a4d36e954cf1";
+        image = "ghcr.io/lostb1t/remux:latest";
         autoStart = true;
-        ports = [
-          "127.0.0.1:${toString cfg.port}:8080"
-        ];
-        extraOptions = [
-          "--network=${service}"
-          "--read-only"
-          "--security-opt=no-new-privileges"
-          "--cap-drop=ALL"
-          "--user=nobody"
-        ];
+        ports = [ "127.0.0.1:${toString cfg.port}:3000" ];
+        volumes = [ "${cfg.dataDir}:/data" ];
         environment = {
-          # Podman's IPv4 host-port forwarding cannot reach Redlib's default
-          # IPv6 listener on this host.
-          IPV4_ONLY = "1";
+          HOME = "/data";
           TZ = homelab.timeZone;
         };
+        extraOptions = [
+          "--network=${service}"
+          "--user=${toString config.users.users.${homelab.user}.uid}:${toString config.users.groups.${homelab.group}.gid}"
+          "--device=/dev/dri:/dev/dri"
+          "--group-add=${toString config.users.groups.video.gid}"
+          "--group-add=${toString config.users.groups.render.gid}"
+        ];
       };
     };
 
-    # Create a dedicated Podman network so its subnet can be routed around the VPN
     systemd.services."podman-network-${service}" = {
       description = "Create Podman network for ${service}";
       before = [ "podman-${service}.service" ];
@@ -85,8 +76,6 @@ in
       };
     };
 
-    # Reddit blocks the VPS public IP, so redlib must reach Reddit through the home
-    # WAN. Route its container subnet around the WireGuard tunnel.
     networking.wg-quick.interfaces.wg0.postUp = ''
       ${pkgs.iproute2}/bin/ip rule add from ${networkSubnet} table main priority 86
     '';
@@ -100,6 +89,9 @@ in
         reverse_proxy http://127.0.0.1:${toString cfg.port}
       '';
     };
-  };
 
+    environment.persistence."/".directories = [
+      { directory = cfg.dataDir; user = homelab.user; group = homelab.group; mode = "0775"; }
+    ];
+  };
 }

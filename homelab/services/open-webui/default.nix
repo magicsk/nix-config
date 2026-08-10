@@ -50,6 +50,10 @@ in
         OPENAI_API_BASE_URLS = "http://127.0.0.1:8090/v1";
         OPENAI_API_KEYS = "";
         AIOHTTP_CLIENT_TIMEOUT = "600";
+      }
+      // lib.optionalAttrs config.homelab.services."codex-wrapper".enable {
+        DEFAULT_MODELS = "gpt-5.6-sol:medium";
+        DEFAULT_PINNED_MODELS = "gpt-5.6-sol:medium,gpt-5.6-terra:medium,gpt-5.6-luna:medium";
       };
     };
 
@@ -64,6 +68,12 @@ in
         DynamicUser = lib.mkForce false;
         User = service;
         Group = service;
+        # Startup performs a blocking remote fetch before binding the web port.
+        # Prefer working IPv4 instead of waiting on the host's black-holed IPv6.
+        RestrictAddressFamilies = lib.mkForce [
+          "AF_INET"
+          "AF_UNIX"
+        ];
       };
     }
     // lib.optionalAttrs config.homelab.services."codex-wrapper".enable {

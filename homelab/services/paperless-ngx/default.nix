@@ -72,16 +72,14 @@ in
               optimize = 1;
               pdfa_image_compression = "lossless";
             };
-            PAPERLESS_CONSUMER_IGNORE_PATTERN = builtins.toJSON [
-              ".DS_STORE/*"
-              "desktop.ini"
-            ];
+            PAPERLESS_CONSUMER_DELETE_DUPLICATES = "true";
             PAPERLESS_CONSUMER_RECURSIVE = "true";
             USERMAP_UID = "1000";
             USERMAP_GID = "1000";
           };
           environmentFiles = [
             cfg.passwordFile
+            "${cfg.dataDir}/secrets.env"
           ];
           ports = [
             "127.0.0.1:8000:8000"

@@ -77,7 +77,8 @@ in
       homeassistant.enable = true;
       mosquitto.enable = true;
       zigbee2mqtt.enable = true;
-      jellyfin.enable = true;
+      crosswatch.enable = true;
+      remux.enable = true;
       paperless = {
         enable = true;
         passwordFile = config.age.secrets.paperlessPassword.path;
@@ -115,6 +116,7 @@ in
       esphome.enable = true;
       otbr.enable = true;
       matter-server.enable = true;
+      monitoring.enable = true;
       minecraft = {
         enable = true;
         name = "monifactory";

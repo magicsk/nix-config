@@ -51,15 +51,14 @@ in
       oci-containers = {
         containers = {
           otbr = {
-            image = "openthread/border-router:latest";
+            image = "openthread/border-router:sha-8ee13eb";
             autoStart = true;
             extraOptions = [
-              "--pull=newer"
               "--network=host"
               "--privileged"
               "--cap-add=NET_ADMIN"
               "--cap-add=NET_RAW"
-              "--device=/dev/serial/by-id/usb-1a86_USB_Serial-if00-port0:/dev/ttyACM0"
+              "--device=/dev/serial/by-id/usb-1a86_USB_Single_Serial_58CF091384-if00:/dev/ttyACM0"
               "--device=/dev/net/tun:/dev/net/tun"
             ];
             volumes = [

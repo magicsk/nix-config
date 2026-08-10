@@ -20,6 +20,7 @@ let
       (portClaim "changedetection-io" hl."changedetection-io".port hl."changedetection-io".enable)
       (portClaim "codex-wrapper" hl."codex-wrapper".port hl."codex-wrapper".enable)
       (portClaim "code-server" 8443 hl."code-server".enable)
+      (portClaim "crosswatch" hl.crosswatch.port hl.crosswatch.enable)
       (portClaim "esphome" config.services.esphome.port hl.esphome.enable)
       (portClaim "flaresolverr" 8191 hl.flaresolverr.enable)
       (portClaim "go2rtc-http" 1984 hl.go2rtc.enable)
@@ -28,11 +29,16 @@ let
       (portClaim "html2rss-web" hl."html2rss-web".port hl."html2rss-web".enable)
       (portClaim "homepage" config.services."homepage-dashboard".listenPort hl.homepage.enable)
       (portClaim "immich" config.services.immich.port hl.immich.enable)
-      (portClaim "jellyfin" 8096 hl.jellyfin.enable)
       (portClaim "jellyseerr" hl.jellyseerr.port hl.jellyseerr.enable)
       (portClaim "matter-server" 5580 hl."matter-server".enable)
       (portClaim "minecraft" 25565 hl.minecraft.enable)
       (portClaim "minecraft-rcon" 25575 hl.minecraft.enable)
+      (portClaim "monitoring-alloy" 12345 hl.monitoring.enable)
+      (portClaim "monitoring-grafana" config.services.grafana.settings.server.http_port hl.monitoring.enable)
+      (portClaim "monitoring-loki" 3100 hl.monitoring.enable)
+      (portClaim "monitoring-node-exporter" 9100 hl.monitoring.enable)
+      (portClaim "monitoring-prometheus" config.services.prometheus.port hl.monitoring.enable)
+      (portClaim "monitoring-systemd-exporter" 9558 hl.monitoring.enable)
       (portClaim "mosquitto" 1883 hl.mosquitto.enable)
       (portClaim "obico-ml" 3333 hl."obico-ml".enable)
       (portClaim "open-webui" config.services."open-webui".port hl."open-webui".enable)
@@ -43,6 +49,7 @@ let
       (portClaim "qbittorrent" 8112 hl.qbittorrent.enable)
       (portClaim "radarr" 7878 hl.radarr.enable)
       (portClaim "redlib" hl.redlib.port hl.redlib.enable)
+      (portClaim "remux" hl.remux.port hl.remux.enable)
       (portClaim "sonarr" 8989 hl.sonarr.enable)
       (portClaim "vaultwarden" 8222 hl.vaultwarden.enable)
       (portClaim "zigbee2mqtt" 8181 hl.zigbee2mqtt.enable)
@@ -155,6 +162,7 @@ in
     ./changedetection-io
     ./codex-wrapper
     ./code-server
+    ./crosswatch
     ./esphome
     ./flaresolverr
     ./go2rtc
@@ -163,9 +171,9 @@ in
     ./html2rss-web
     ./homepage
     ./immich
-    ./jellyfin
     ./matter-server
     ./minecraft
+    ./monitoring
     ./mosquitto
     ./nextcloud
     ./obico-ml
@@ -176,6 +184,7 @@ in
     ./postgresql
     ./qbittorrent
     ./redlib
+    ./remux
     ./redis
     ./stalwart
     ./trakt-backup

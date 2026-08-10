@@ -1,74 +1,65 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 let
-  service = "redlib";
+  service = "crosswatch";
   cfg = config.homelab.services.${service};
   homelab = config.homelab;
-  networkSubnet = "172.30.16.0/24";
+  networkSubnet = "172.30.18.0/24";
 in
 {
   options.homelab.services.${service} = {
-    enable = lib.mkEnableOption {
-      description = "Enable ${service}";
+    enable = lib.mkEnableOption "CrossWatch media sync";
+    dataDir = lib.mkOption {
+      type = lib.types.str;
+      default = "${homelab.mounts.config}/${service}";
     };
     url = lib.mkOption {
       type = lib.types.str;
-      default = "redlib.${homelab.baseDomain}";
+      default = "${service}.${homelab.baseDomain}";
     };
     port = lib.mkOption {
       type = lib.types.port;
-      default = 8282;
+      default = 8787;
     };
     homepage.name = lib.mkOption {
       type = lib.types.str;
-      default = "redlib";
+      default = "CrossWatch";
     };
     homepage.description = lib.mkOption {
       type = lib.types.str;
-      default = "Alternative front-end for reddit";
+      default = "Media watch-state sync";
     };
     homepage.icon = lib.mkOption {
       type = lib.types.str;
-      default = "redlib.svg";
+      default = "sh-crosswatch";
     };
     homepage.category = lib.mkOption {
       type = lib.types.str;
-      default = "Services";
-    };
-    homepage.siteMonitor = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      description = "Whether homepage should probe ${service} for status.";
+      default = "Media";
     };
   };
+
   config = lib.mkIf cfg.enable {
-    # The published Quay image currently uses a broken upstream build path. Build
-    # this pinned commit locally with Dockerfile.ubuntu and validate it before
-    # bumping the tag; the nixpkgs build still lacks the current Reddit TLS client.
     virtualisation = {
       podman.enable = true;
       oci-containers.containers.${service} = {
-        image = "localhost/redlib:a4d36e954cf1";
+        image = "ghcr.io/cenodude/crosswatch:latest";
         autoStart = true;
-        ports = [
-          "127.0.0.1:${toString cfg.port}:8080"
-        ];
-        extraOptions = [
-          "--network=${service}"
-          "--read-only"
-          "--security-opt=no-new-privileges"
-          "--cap-drop=ALL"
-          "--user=nobody"
-        ];
+        ports = [ "127.0.0.1:${toString cfg.port}:8787" ];
+        volumes = [ "${cfg.dataDir}:/config" ];
         environment = {
-          # Podman's IPv4 host-port forwarding cannot reach Redlib's default
-          # IPv6 listener on this host.
-          IPV4_ONLY = "1";
+          APP_UID = toString config.users.users.${homelab.user}.uid;
+          APP_GID = toString config.users.groups.${homelab.group}.gid;
           TZ = homelab.timeZone;
         };
+        extraOptions = [ "--network=${service}" ];
       };
     };
 
-    # Create a dedicated Podman network so its subnet can be routed around the VPN
     systemd.services."podman-network-${service}" = {
       description = "Create Podman network for ${service}";
       before = [ "podman-${service}.service" ];
@@ -85,8 +76,6 @@ in
       };
     };
 
-    # Reddit blocks the VPS public IP, so redlib must reach Reddit through the home
-    # WAN. Route its container subnet around the WireGuard tunnel.
     networking.wg-quick.interfaces.wg0.postUp = ''
       ${pkgs.iproute2}/bin/ip rule add from ${networkSubnet} table main priority 86
     '';
@@ -100,6 +89,9 @@ in
         reverse_proxy http://127.0.0.1:${toString cfg.port}
       '';
     };
-  };
 
+    environment.persistence."/".directories = [
+      { directory = cfg.dataDir; user = homelab.user; group = homelab.group; mode = "0775"; }
+    ];
+  };
 }

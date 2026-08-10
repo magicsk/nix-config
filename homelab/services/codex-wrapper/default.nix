@@ -8,7 +8,7 @@ let
   service = "codex-wrapper";
   cfg = config.homelab.services.${service};
   homelab = config.homelab;
-  modelCatalogVersion = "gpt-5.5-only-xhigh-stream-v1";
+  modelCatalogVersion = "gpt-5.6-family-max-stream-v1";
   codexConfig = pkgs.writeText "codex-wrapper-config.toml" ''
     model = "${cfg.model}"
     model_reasoning_effort = "${cfg.reasoning}"
@@ -24,7 +24,6 @@ let
     npm_cache=${lib.escapeShellArg "${cfg.dataDir}/npm-cache"}
     marker=${lib.escapeShellArg "${cfg.dataDir}/.codexbridge-prepared"}
     desired_marker=${lib.escapeShellArg "rev=${cfg.sourceRev} sdk=${cfg.codexSdkVersion} model=${cfg.model} catalog=${modelCatalogVersion}"}
-    default_model=${lib.escapeShellArg cfg.model}
     as_user=(runuser -u ${lib.escapeShellArg homelab.user} --)
 
     install -d -m 0750 -o ${homelab.user} -g ${homelab.group} ${cfg.dataDir}
@@ -53,29 +52,57 @@ let
       if ! grep -Fq 'app.listen(PORT, "127.0.0.1", () => {' "$source_dir/server.js"; then
         sed -i 's/app.listen(PORT, () => {/app.listen(PORT, "127.0.0.1", () => {/' "$source_dir/server.js"
       fi
-      "''${as_user[@]}" node - "$source_dir/server.js" "$default_model" <<'NODE'
+      "''${as_user[@]}" node - "$source_dir/server.js" <<'NODE'
     const fs = require("fs");
 
     const file = process.argv[2];
-    const defaultModel = process.argv[3];
     let text = fs.readFileSync(file, "utf8");
 
-    const modelPresets = [
-      "const MODEL_PRESETS = [",
-      "  {",
-      "    id: \"" + defaultModel + "\",",
-      "    label: \"GPT-5.5 Codex\",",
-      "    description: \"Codex model for coding and agentic development tasks.\",",
-      "    reasonings: [",
-      "      { level: \"low\", label: \"Low\", description: \"Fastest responses for simple tasks.\" },",
-      "      { level: \"medium\", label: \"Medium\", description: \"Balanced depth and speed.\" },",
-      "      { level: \"high\", label: \"High\", description: \"Deeper reasoning for complex changes.\" },",
-      "      { level: \"xhigh\", label: \"Extra High\", description: \"Maximum reasoning depth when available.\" },",
-      "    ],",
-      "    defaultReasoning: \"medium\",",
-      "  },",
-      "];",
-    ].join("\n");
+    const reasoningPresets = [
+      { level: "low", label: "Low", description: "Fast responses for well-scoped tasks." },
+      { level: "medium", label: "Medium", description: "Balanced depth and speed." },
+      { level: "high", label: "High", description: "Deeper reasoning for complex tasks." },
+      { level: "xhigh", label: "Extra High", description: "Extended reasoning for difficult tasks." },
+      { level: "max", label: "Max", description: "Maximum single-agent reasoning for the hardest tasks." },
+    ];
+    const models = [
+      {
+        id: "gpt-5.6-sol",
+        label: "GPT-5.6 Sol",
+        description: "Frontier model for complex, open-ended, and high-value work.",
+      },
+      {
+        id: "gpt-5.6-terra",
+        label: "GPT-5.6 Terra",
+        description: "Balanced everyday model for strong reasoning and tool use.",
+      },
+      {
+        id: "gpt-5.6-luna",
+        label: "GPT-5.6 Luna",
+        description: "Fast, efficient model for clear and repeatable tasks.",
+      },
+    ];
+    const modelPresetLines = ["const MODEL_PRESETS = ["];
+    for (const model of models) {
+      modelPresetLines.push(
+        "  {",
+        "    id: \"" + model.id + "\",",
+        "    label: \"" + model.label + "\",",
+        "    description: \"" + model.description + "\",",
+        "    reasonings: [",
+        ...reasoningPresets.map(
+          (reasoning) =>
+            "      { level: \"" + reasoning.level +
+            "\", label: \"" + reasoning.label +
+            "\", description: \"" + reasoning.description + "\" },",
+        ),
+        "    ],",
+        "    defaultReasoning: \"medium\",",
+        "  },",
+      );
+    }
+    modelPresetLines.push("];");
+    const modelPresets = modelPresetLines.join("\n");
 
     const normalizeReasoning = [
       "function normalizeReasoning(value) {",
@@ -88,7 +115,7 @@ let
       "    \"x-high\": \"xhigh\",",
       "  };",
       "  const normalized = aliases[lowered] ?? lowered;",
-      "  if ([\"low\", \"medium\", \"high\", \"xhigh\"].includes(normalized)) {",
+      "  if ([\"low\", \"medium\", \"high\", \"xhigh\", \"max\"].includes(normalized)) {",
       "    return normalized;",
       "  }",
       "  return null;",
@@ -196,7 +223,7 @@ in
     };
     model = lib.mkOption {
       type = lib.types.str;
-      default = "gpt-5.5";
+      default = "gpt-5.6-sol";
     };
     reasoning = lib.mkOption {
       type = lib.types.enum [
@@ -204,6 +231,7 @@ in
         "medium"
         "high"
         "xhigh"
+        "max"
       ];
       default = "medium";
     };
@@ -236,7 +264,7 @@ in
     };
     codexSdkVersion = lib.mkOption {
       type = lib.types.str;
-      default = "0.135.0";
+      default = "0.146.0";
       description = "Pinned @openai/codex-sdk version to use with CodexBridge.";
     };
   };
